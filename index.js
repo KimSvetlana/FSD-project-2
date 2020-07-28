@@ -1,54 +1,89 @@
 (function($) {
     $.fn.mySliderPlugin= function(options) {
         
+        // настройки по умолчанию
         options = $.extend({            
             backgroundColor: 'aqua',
-            height: 8,
+            expansion: '100%',
+            thickness: 8,
             vertical: false,
         }, options);
 
         const makeSliderFunction = function(){
 
+            //добавляем HTML содержание
             let $this = $(this);
             let content = " <div class='slider-range-content'><div class='slider-range-min'></div><span class='slider-range-handle' ></span><p>Значение: <span id='slider-range-value'>0</span></p></div>"
             
             $($this).append(content);
 
+            
+            let slider =$this.find('.slider-range-content');
+            let handle =$this.find('.slider-range-handle');
+            let colorRange = $this.find('.slider-range-min');
+            
+            let sliderValue = $this.find('#slider-range-value');
 
-            let slider = $('.slider-range-content')
-            let handle = $('.slider-range-handle')
-            let colorRange = $('.slider-range-min')
+            // определяем ориентацию слайдера
+            var length = "";
+            var thickness = "";
 
-            colorRange.css("background-color", options.backgroundColor);
-            slider.css('height', options.height);
-            colorRange.css('height', options.height);
-
-            if(options.vertical){
-                slider.css('height', '100%');
-                colorRange.css('height', '100%');
-                slider.css('width', 8);
-                colorRange.css('width', 8);
+            if (options.vertical){
+                length = "height";
+                thickness = "width";
+            }
+            else{
+                length = "width";
+                thickness = "height";
             }
 
-            let sliderValue = $('#slider-range-value')
+            colorRange.css("background-color", options.backgroundColor);
+            slider.css(thickness, options.thickness);
+            colorRange.css(thickness, options.thickness);
+            slider.css(length, options.expansion);
+            // colorRange.css(length, options.expansion);
 
+            // функция работы слайдера
             const onHandleMove = (movePosition) => {
-                const minPos = slider.offset().left;
-                const maxPos = minPos + slider.width();
-                let moveX = movePosition.pageX;
-
-                if(moveX < minPos){
-                    moveX = minPos;
+                let minPos;
+                let maxPos;
+                
+                if(options.vertical){
+                    minPos = slider.offset().top;
+                    maxPos = minPos + slider.height();
                 }
-                else if(moveX > maxPos){
-                    moveX = maxPos;
+                else{
+                    minPos = slider.offset().left;
+                    maxPos = minPos + slider.width();
+                }
+                
+                let movePos = '';
+
+                if(options.vertical){
+                    movePos = movePosition.pageY
+                }
+                else{
+                    movePos = movePosition.pageX;
                 }
 
-                handle.offset({left:moveX});
+                if(movePos < minPos){
+                    movePos = minPos;
+                }
+                else if(movePos > maxPos){
+                    movePos = maxPos;
+                }
 
-                colorRange.css('width', moveX - minPos);
+                if(options.vertical){
+                    handle.offset({top:movePos});
+                }
+                else{
+                    handle.offset({left:movePos});
+                }
 
-                sliderValue.text(moveX - minPos);
+
+                colorRange.css(length, movePos - minPos);
+
+                sliderValue.text(movePos - minPos);
             };
 
             const onHandleMouseDown  = () => {
@@ -70,6 +105,8 @@
 })(jQuery);
 
 $('.slider-range-container').mySliderPlugin();
+$('.vertical-slider').mySliderPlugin({vertical:true});
+
 
 
 // для выбора одного(текущего обЪекта)
