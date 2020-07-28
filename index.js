@@ -30,7 +30,6 @@
                 colorRange.css('width', 8);
             }
 
-
             let sliderValue = $('#slider-range-value')
 
             const onHandleMove = (movePosition) => {
