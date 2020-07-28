@@ -41,31 +41,28 @@
             slider.css(thickness, options.thickness);
             colorRange.css(thickness, options.thickness);
             slider.css(length, options.expansion);
-            // colorRange.css(length, options.expansion);
+            
+            handle.css({'width': 2*options.thickness, 'height': 2*options.thickness});
 
             // функция работы слайдера
             const onHandleMove = (movePosition) => {
                 let minPos;
                 let maxPos;
-                
+                let movePos;
+                let offsetProperty;
                 if(options.vertical){
                     minPos = slider.offset().top;
                     maxPos = minPos + slider.height();
+                    movePos = movePosition.pageY;
+                    offsetProperty = "top";
                 }
                 else{
                     minPos = slider.offset().left;
                     maxPos = minPos + slider.width();
+                    movePos = movePosition.pageX;
+                    offsetProperty = "left";
                 }
                 
-                let movePos = '';
-
-                if(options.vertical){
-                    movePos = movePosition.pageY
-                }
-                else{
-                    movePos = movePosition.pageX;
-                }
-
                 if(movePos < minPos){
                     movePos = minPos;
                 }
@@ -73,14 +70,11 @@
                     movePos = maxPos;
                 }
 
-                if(options.vertical){
-                    handle.offset({top:movePos});
-                }
-                else{
-                    handle.offset({left:movePos});
-                }
+                let offsetModifier = {};
+                offsetModifier[offsetProperty] = movePos;
+                handle.offset(offsetModifier);
 
-
+                // закрашиваем слайдер цветом
                 colorRange.css(length, movePos - minPos);
 
                 sliderValue.text(movePos - minPos);
@@ -105,7 +99,7 @@
 })(jQuery);
 
 $('.slider-range-container').mySliderPlugin();
-$('.vertical-slider').mySliderPlugin({vertical:true});
+$('.vertical-slider').mySliderPlugin({vertical:true, thickness:'15'});
 
 
 

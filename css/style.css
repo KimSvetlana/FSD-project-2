@@ -24,8 +24,6 @@
 }
 .slider-range-handle{
     position: absolute;
-    width: 16px;
-    height: 16px;
     border-radius: 50%;
     background-color: blueviolet;
     border: 1px solid black;
