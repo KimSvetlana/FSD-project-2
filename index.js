@@ -4,6 +4,7 @@
         options = $.extend({            
             backgroundColor: 'aqua',
             height: 8,
+            vertical: false,
         }, options);
 
         const makeSliderFunction = function(){
@@ -21,6 +22,13 @@
             colorRange.css("background-color", options.backgroundColor);
             slider.css('height', options.height);
             colorRange.css('height', options.height);
+
+            if(options.vertical){
+                slider.css('height', '100%');
+                colorRange.css('height', '100%');
+                slider.css('width', 8);
+                colorRange.css('width', 8);
+            }
 
 
             let sliderValue = $('#slider-range-value')
