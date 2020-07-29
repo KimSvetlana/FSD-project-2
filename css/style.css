@@ -6,7 +6,6 @@
 .vertical-slider{
     margin-top: 30px;
     margin-left: 30px;
-    background-color: rgba(229, 183, 238, 0.925);
     width: 150px;
     height: 450px;
 }
@@ -14,8 +13,8 @@
 
 .slider-range-content {
     position: relative;
-    border : 1px solid black;
     border-radius: 4px;
+    background-color: whitesmoke;
 }
 
 .slider-range-min{
@@ -26,8 +25,5 @@
     position: absolute;
     border-radius: 50%;
     background-color: blueviolet;
-    border: 1px solid black;
-    left: -3px;
-    top: -5px;
     z-index: 1;
 }

@@ -13,7 +13,7 @@
 
             //добавляем HTML содержание
             let $this = $(this);
-            let content = " <div class='slider-range-content'><div class='slider-range-min'></div><span class='slider-range-handle' ></span><p>Значение: <span id='slider-range-value'>0</span></p></div>"
+            let content = "<div class='slider-range-content'><div class='slider-range-min'></div><span class='slider-range-handle' ></span></div><p>Значение: <span id='slider-range-value'>0</span></p>"
             
             $($this).append(content);
 
@@ -25,24 +25,32 @@
             let sliderValue = $this.find('#slider-range-value');
 
             // определяем ориентацию слайдера
-            var length = "";
-            var thickness = "";
+            let length = '';
+            let thickness = '';
+            let handlePos = '';
 
             if (options.vertical){
-                length = "height";
-                thickness = "width";
+                length = 'height';
+                thickness = 'width';
+                handlePos = 'left'
             }
             else{
-                length = "width";
-                thickness = "height";
+                length = 'width';
+                thickness = 'height';
+                handlePos = 'top';
             }
 
-            colorRange.css("background-color", options.backgroundColor);
+            colorRange.css('background-color', options.backgroundColor);
             slider.css(thickness, options.thickness);
             colorRange.css(thickness, options.thickness);
             slider.css(length, options.expansion);
-            
+
+            // параметры и расположение рукоятки
             handle.css({'width': 2*options.thickness, 'height': 2*options.thickness});
+           
+            let handlePosObject = {};
+            handlePosObject[handlePos] = -options.thickness/2;
+            handle.css(handlePosObject);
 
             // функция работы слайдера
             const onHandleMove = (movePosition) => {
@@ -54,13 +62,13 @@
                     minPos = slider.offset().top;
                     maxPos = minPos + slider.height();
                     movePos = movePosition.pageY;
-                    offsetProperty = "top";
+                    offsetProperty = 'top';
                 }
                 else{
                     minPos = slider.offset().left;
                     maxPos = minPos + slider.width();
                     movePos = movePosition.pageX;
-                    offsetProperty = "left";
+                    offsetProperty = 'left';
                 }
                 
                 if(movePos < minPos){
@@ -99,7 +107,7 @@
 })(jQuery);
 
 $('.slider-range-container').mySliderPlugin();
-$('.vertical-slider').mySliderPlugin({vertical:true, thickness:'15'});
+$('.vertical-slider').mySliderPlugin({vertical:true, thickness: 15});
 
 
 
