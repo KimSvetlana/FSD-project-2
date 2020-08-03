@@ -6,16 +6,19 @@
             backgroundColor: 'aqua',
             expansion: '100%',
             thickness: 8,
+            isSingle: true,
             vertical: false,
             indicatorVisibility: false,
             slideHandler: null,
         }, options);
 
+
         const makeSliderFunction = function(){
 
             //добавляем HTML содержание
             let $this = $(this);
-            let content = "<div class='slider-range-content'><div class='slider-range-min'></div><span class='slider-range-handle' ></span></div><p>Значение: <span id='slider-range-value'>0</span></p>"
+            // console.log($this);
+            let content = "<div class='slider-range-content'><div class='slider-range-min'></div><span class='slider-range-handle'></span><span class='slider-range-handle' ></span></div><p>Значение: <span id='slider-range-value'>0</span></p>"
             
             $($this).append(content);
 
@@ -28,17 +31,17 @@
                     handler(sliderCenterPos, sliderRadius);
                 })
             };
-
-
-
             
             let slider =$this.find('.slider-range-content');
             let handle =$this.find('.slider-range-handle');
+            console.log(handle);
+            let handleMin = handle.first();
+            let handleMax = handle.last();
             let colorRange = $this.find('.slider-range-min');
             
             let sliderValue = $this.find('#slider-range-value');
 
-            // определяем ориентацию слайдера
+            // определяем переменные и ориентацию слайдера
             let _leftPropertyName;
             let _widthPropertyName = '';
             let _thicknessPropertyName = '';
@@ -64,10 +67,17 @@
             colorRange.css(_thicknessPropertyName, options.thickness);
             slider.css(_widthPropertyName, options.expansion);
 
-            // параметры и расположение рукоятки
+            // параметры и расположение бегунка
             handle.css({'width': _handleWidth, 'height': _handleHeight});
 
-            // зная все размеры, можно уточнить границы перемещения рукоятки
+            // выравнивание бегунка относительно кулисы
+            handle.css(_topPropertyName, -options.thickness/2);
+
+            if(options.isSingle){
+                handleMax.hide();
+            }
+            
+            // зная все размеры, можно уточнить границы перемещения бегунка
             let _minPos;
             let _maxPos;
             if(!options.vertical){
@@ -79,17 +89,15 @@
                 _maxPos = _minPos + slider.height() - _handleHeight;
             }
 
-            // выравнивание рукоятки относительно кулисы
-            let handlePosObject = {};
-            handlePosObject[_topPropertyName] = -options.thickness/2;
-            handle.css(handlePosObject);
-
+            // определяем индикаотр значений
             let indicatorContent = "<span class='indicator'>0</span>";
             if(options.indicatorVisibility){
                 slider.append(indicatorContent);
             }
             let indicator = $this.find('.indicator');
-            
+            let indicatorWidth = indicator.outerWidth();
+            // корректируем положение индикатора
+            indicator.css(_leftPropertyName, (_handleWidth/2 - indicatorWidth/2));
 
             // функция работы слайдера
             const onHandleMove = (movePosition) => {
@@ -110,11 +118,8 @@
 
                 let offsetModifier = {};
                 offsetModifier[_leftPropertyName] = movePos;
-                handle.offset(offsetModifier);
-
-                indicator.offset(offsetModifier);
-
-                
+                handle.offset(offsetModifier); // передаем координаты бегунку
+   
                 let textValue = movePos - _minPos;
                 if(movePos === _maxPos){
                     sliderValue.text(textValue + 2 * options.thickness);
@@ -125,7 +130,7 @@
                     indicator.text(textValue);
                 }
                 
-                // вызываем событие перемещкния(передаем координату центра и радиус бегунка )
+                // вызываем событие перемещения(передаем координату центра и радиус бегунка )
                 handleMovedEvent(movePos + _handleWidth / 2, _handleWidth / 2);
             };
             
@@ -134,6 +139,9 @@
 
                 // При перемещении надо закрасить слайдер цветом
                 applyColorToSlider(_minPos, handleCenterPosition);
+
+                // при перемещении бегунка переместить индикатор
+                indicatorMoved(handleCenterPosition);
             };
 
             // Закрасить слайдер
@@ -143,7 +151,12 @@
                 colorRange.css(offSetObject);
                 colorRange.css(_widthPropertyName, colorWidth);
             };
-
+            // перемещаем индикатор
+            const indicatorMoved = function(coordinatеs) {
+                let modifier = {};
+                modifier[_leftPropertyName] = coordinatеs - indicator.outerWidth() / 2;
+                indicator.offset(modifier); //передаем координаты индикатору
+            };
 
             _handleMovedHandlers.push(onHandleMoved);
 
@@ -159,8 +172,8 @@
             slider.on('click', onHandleMove)
 
         };
-     
-       return this.each(makeSliderFunction);        
+        
+       return this.each(makeSliderFunction); 
     };
 
 })(jQuery);
