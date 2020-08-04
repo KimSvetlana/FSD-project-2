@@ -1,4 +1,12 @@
+.container{
+    width: 100%;
+}
 .slider-range-container{
+    width: 450px;
+    margin-top: 50px;
+    margin-left: 30px;
+}
+.slider-range{
     width: 450px;
     margin-top: 50px;
     margin-left: 30px;

@@ -26,17 +26,29 @@
             if (options.slideHandler != null)
                 _handleMovedHandlers.push(options.slideHandler);
 
-            const handleMovedEvent = function(sliderCenterPos, sliderRadius){
+            const handleMovedEvent = function(handlePos, handleRadius){
                 _handleMovedHandlers.forEach(handler => {
-                    handler(sliderCenterPos, sliderRadius);
+                    handler(handlePos, handleRadius);
                 })
             };
             
             let slider =$this.find('.slider-range-content');
-            let handle =$this.find('.slider-range-handle');
-            console.log(handle);
-            let handleMin = handle.first();
-            let handleMax = handle.last();
+            let handles =$this.find('.slider-range-handle');
+
+            let handleMin = {
+                jqueryObject : handles.first(),
+                currentPos : 0,
+                maxPos : 0,
+                minPos : 0,
+            };
+
+            let handleMax = {
+                ... handleMin,
+                jqueryObject : handles.last(),
+            };
+            
+           
+            let activeHandle = handleMax;
             let colorRange = $this.find('.slider-range-min');
             
             let sliderValue = $this.find('#slider-range-value');
@@ -67,28 +79,6 @@
             colorRange.css(_thicknessPropertyName, options.thickness);
             slider.css(_widthPropertyName, options.expansion);
 
-            // параметры и расположение бегунка
-            handle.css({'width': _handleWidth, 'height': _handleHeight});
-
-            // выравнивание бегунка относительно кулисы
-            handle.css(_topPropertyName, -options.thickness/2);
-
-            if(options.isSingle){
-                handleMax.hide();
-            }
-            
-            // зная все размеры, можно уточнить границы перемещения бегунка
-            let _minPos;
-            let _maxPos;
-            if(!options.vertical){
-                _minPos = slider.offset().left;
-                _maxPos = _minPos + slider.width() - _handleWidth;
-            }
-            else{
-                _minPos = slider.offset().top;
-                _maxPos = _minPos + slider.height() - _handleHeight;
-            }
-
             // определяем индикаотр значений
             let indicatorContent = "<span class='indicator'>0</span>";
             if(options.indicatorVisibility){
@@ -98,10 +88,45 @@
             let indicatorWidth = indicator.outerWidth();
             // корректируем положение индикатора
             indicator.css(_leftPropertyName, (_handleWidth/2 - indicatorWidth/2));
+            
+            // параметры и расположение бегунка
+            handles.css({'width': _handleWidth, 'height': _handleHeight});
+            // выравнивание бегунка относительно кулисы
+            handles.css(_topPropertyName, -options.thickness/2);
+
+            // если бегунок один
+            if(options.isSingle){
+                handleMin.jqueryObject.hide();
+            }
+
+            let sliderWidth = parseFloat(slider.css(_widthPropertyName));
+            // задаем координаты для второго бегунка при его наличии
+            if(!options.isSingle){
+                handleMax.jqueryObject.css(_leftPropertyName, sliderWidth - _handleWidth);
+            }
+            
+            // зная все размеры, можно уточнить границы слайдера
+            let _sliderMinPos;
+            let _sliderMaxPos;
+            if(!options.vertical){
+                _sliderMinPos = slider.offset().left;
+                _sliderMaxPos = _sliderMinPos + slider.width() - _handleWidth;
+            }
+            else{
+                _sliderMinPos = slider.offset().top;
+                _sliderMaxPos = _sliderMinPos + slider.height() - _handleHeight;
+            }
+            // зная границы, определяем перемещение бегунка
+            handleMax.maxPos = _sliderMaxPos;
+            handleMin.minPos = _sliderMinPos;
+            handleMin.currentPos = parseFloat(handleMin.jqueryObject.css(_leftPropertyName));
+            handleMax.currentPos = parseFloat(handleMax.jqueryObject.css(_leftPropertyName));
 
             // функция работы слайдера
             const onHandleMove = (movePosition) => {
                 let movePos;
+                
+                // Коррекция на радиус
                 if(options.vertical){
                     movePos = movePosition.pageY - _handleHeight / 2;
                 }
@@ -109,19 +134,24 @@
                     movePos = movePosition.pageX - _handleWidth / 2;
                 }
                 
-                if(movePos < _minPos){
-                    movePos = _minPos;
+                // Коррекция на доступную область перемещения
+                if(movePos < activeHandle.minPos){
+                    movePos = activeHandle.minPos;
                 }
-                else if(movePos > _maxPos){
-                    movePos = _maxPos;
+                else if(movePos > activeHandle.maxPos){
+                    movePos = activeHandle.maxPos;
                 }
 
+                activeHandle.currentPos = movePos;
+                
                 let offsetModifier = {};
                 offsetModifier[_leftPropertyName] = movePos;
-                handle.offset(offsetModifier); // передаем координаты бегунку
+
+                activeHandle.jqueryObject.offset(offsetModifier); // передаем координаты бегунку
+
    
-                let textValue = movePos - _minPos;
-                if(movePos === _maxPos){
+                let textValue = movePos - _sliderMinPos;
+                if(movePos === _sliderMaxPos){
                     sliderValue.text(textValue + 2 * options.thickness);
                     indicator.text(textValue + 2 * options.thickness);
                 }
@@ -131,24 +161,24 @@
                 }
                 
                 // вызываем событие перемещения(передаем координату центра и радиус бегунка )
-                handleMovedEvent(movePos + _handleWidth / 2, _handleWidth / 2);
+                handleMovedEvent(activeHandle.currentPos, _handleWidth / 2);
             };
             
             // Обработать перемещение бегунка
-            const onHandleMoved = function(handleCenterPosition, handleRad){
-
+            const onHandleMoved = function(pos, rad){
                 // При перемещении надо закрасить слайдер цветом
-                applyColorToSlider(_minPos, handleCenterPosition);
+                applyColorToSlider(handleMin.currentPos, handleMax.currentPos);
 
                 // при перемещении бегунка переместить индикатор
-                indicatorMoved(handleCenterPosition);
+                indicatorMoved(activeHandle.currentPos);
             };
 
             // Закрасить слайдер
             const applyColorToSlider = function(from, to){
                 let colorWidth = to - from;
-                let offSetObject = {_offsetPropertyName: from + _minPos};
-                colorRange.css(offSetObject);
+                let offSetObject = {};
+                offSetObject[_leftPropertyName] = from;
+                colorRange.offset(offSetObject);
                 colorRange.css(_widthPropertyName, colorWidth);
             };
             // перемещаем индикатор
@@ -160,7 +190,17 @@
 
             _handleMovedHandlers.push(onHandleMoved);
 
-            const onHandleMouseDown  = () => {
+            const onHandleMouseDown  = (mouseEvent) => {
+                if (handleMin.jqueryObject.get(0) === mouseEvent.currentTarget) {
+                    activeHandle = handleMin;
+                }
+                else {
+                    activeHandle = handleMax;
+                }
+
+                handleMin.maxPos = handleMax.currentPos;
+                handleMax.minPos = handleMin.currentPos;
+
                 $(document).on('mousemove', onHandleMove);
 
                 $(document).on('mouseup', function() {
@@ -168,18 +208,19 @@
                 })
             };
 
-            handle.on('mousedown', onHandleMouseDown);
-            slider.on('click', onHandleMove)
+            handles.on('mousedown', onHandleMouseDown);
+            slider.on('click', onHandleMove);
 
         };
         
-       return this.each(makeSliderFunction); 
+        return this.each(makeSliderFunction);
     };
 
 })(jQuery);
 
 $('.slider-range-container').mySliderPlugin({indicatorVisibility: true});
-$('.vertical-slider').mySliderPlugin({vertical:true, thickness: 15, indicatorVisibility: true});
+$('.slider-range').mySliderPlugin({isSingle: false, indicatorVisibility: true});
+$('.vertical-slider').mySliderPlugin({isSingle:false, vertical:true, thickness: 15, indicatorVisibility: true});
 
 
 
