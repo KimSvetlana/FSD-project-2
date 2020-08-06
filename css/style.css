@@ -22,18 +22,21 @@
 .slider-range-content {
     position: relative;
     border-radius: 4px;
-    background-color: whitesmoke;
+    background-color: #eef0f6;
 }
 
-.slider-range-min{
+.slider-color-range{
     position: absolute;
     border-radius: 4px;
 }
 .slider-range-handle{
     position: absolute;
     border-radius: 50%;
-    background-color: blueviolet;
+    background-color: #37DA7E;
     z-index: 1;
+}
+.slider-range-handle:active{
+    background-color:#458645;
 }
 .indicator{
     display: inline-block;

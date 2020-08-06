@@ -3,22 +3,25 @@
         
         // настройки по умолчанию
         options = $.extend({            
-            backgroundColor: 'aqua',
+            backgroundColor: '#759cd8',
             expansion: '100%',
             thickness: 8,
-            isSingle: true,
+            min:0,
+            max: 450,
+            step: 1,
+            scaleOfValues : false,
+            isDouble: false,
             vertical: false,
             indicatorVisibility: false,
             slideHandler: null,
         }, options);
 
-
         const makeSliderFunction = function(){
 
             //добавляем HTML содержание
             let $this = $(this);
-            // console.log($this);
-            let content = "<div class='slider-range-content'><div class='slider-range-min'></div><span class='slider-range-handle'></span><span class='slider-range-handle' ></span></div><p>Значение: <span id='slider-range-value'>0</span></p>"
+
+            let content = "<div class='slider-range-content'><div class='slider-color-range'></div><span class='slider-range-handle'></span><span class='slider-range-handle' ></span></div><p>Значение: <span id='slider-range-value'>0</span></p>"
             
             $($this).append(content);
 
@@ -32,27 +35,23 @@
                 })
             };
             
-            let slider =$this.find('.slider-range-content');
             let handles =$this.find('.slider-range-handle');
-
+            
             let handleMin = {
                 jqueryObject : handles.first(),
                 currentPos : 0,
                 maxPos : 0,
                 minPos : 0,
             };
-
+            
             let handleMax = {
                 ... handleMin,
                 jqueryObject : handles.last(),
-            };
+            };           
             
-           
             let activeHandle = handleMax;
-            let colorRange = $this.find('.slider-range-min');
             
-            let sliderValue = $this.find('#slider-range-value');
-
+            
             // определяем переменные и ориентацию слайдера
             let _leftPropertyName;
             let _widthPropertyName = '';
@@ -60,6 +59,7 @@
             let _topPropertyName = '';
             let _handleWidth = options.thickness * 2;
             let _handleHeight = options.thickness * 2;
+            
             if(!options.vertical){
                 _leftPropertyName = 'left';
                 _widthPropertyName = 'width';
@@ -74,11 +74,21 @@
             }
             
             // параметры и размеры слайдера
-            colorRange.css('background-color', options.backgroundColor);
+            let slider =$this.find('.slider-range-content');
             slider.css(_thicknessPropertyName, options.thickness);
-            colorRange.css(_thicknessPropertyName, options.thickness);
             slider.css(_widthPropertyName, options.expansion);
-
+            
+            let colorRange = $this.find('.slider-color-range');
+            colorRange.css('background-color', options.backgroundColor);
+            colorRange.css(_thicknessPropertyName, options.thickness);
+            
+            let sliderValue = $this.find('#slider-range-value');
+            if(options.isDouble){
+                sliderValue.html("от <span class = 'minValue'>0</span> до <span class = 'maxValue'>450</span>");
+            }
+            let minValue = sliderValue.find('.minValue');
+            let maxValue = sliderValue.find('.maxValue');
+            
             // определяем индикаотр значений
             let indicatorContent = "<span class='indicator'>0</span>";
             if(options.indicatorVisibility){
@@ -93,16 +103,11 @@
             handles.css({'width': _handleWidth, 'height': _handleHeight});
             // выравнивание бегунка относительно кулисы
             handles.css(_topPropertyName, -options.thickness/2);
-
-            // если бегунок один
-            if(options.isSingle){
-                handleMin.jqueryObject.hide();
-            }
-
-            let sliderWidth = parseFloat(slider.css(_widthPropertyName));
+                        
             // задаем координаты для второго бегунка при его наличии
-            if(!options.isSingle){
-                handleMax.jqueryObject.css(_leftPropertyName, sliderWidth - _handleWidth);
+            let _sliderWidth = parseFloat(slider.css(_widthPropertyName));
+            if(options.isDouble){
+                handleMax.jqueryObject.css(_leftPropertyName, _sliderWidth - _handleWidth);
             }
             
             // зная все размеры, можно уточнить границы слайдера
@@ -119,9 +124,21 @@
             // зная границы, определяем перемещение бегунка
             handleMax.maxPos = _sliderMaxPos;
             handleMin.minPos = _sliderMinPos;
-            handleMin.currentPos = parseFloat(handleMin.jqueryObject.css(_leftPropertyName));
-            handleMax.currentPos = parseFloat(handleMax.jqueryObject.css(_leftPropertyName));
+            if(!options.vertical){
+                handleMin.currentPos = handleMin.jqueryObject.offset().left;
+                handleMax.currentPos = handleMax.jqueryObject.offset().left;
+            }
+            else{
+                handleMin.currentPos = handleMin.jqueryObject.offset().top;
+                handleMax.currentPos = handleMax.jqueryObject.offset().top;
+            }
 
+            colorRange.css(_widthPropertyName, handleMax.currentPos - handleMin.currentPos);
+            
+            // если бегунок один
+            if(!options.isDouble){
+                handleMin.jqueryObject.hide();
+            }
             // функция работы слайдера
             const onHandleMove = (movePosition) => {
                 let movePos;
@@ -147,32 +164,24 @@
                 let offsetModifier = {};
                 offsetModifier[_leftPropertyName] = movePos;
 
-                activeHandle.jqueryObject.offset(offsetModifier); // передаем координаты бегунку
-
-   
-                let textValue = movePos - _sliderMinPos;
-                if(movePos === _sliderMaxPos){
-                    sliderValue.text(textValue + 2 * options.thickness);
-                    indicator.text(textValue + 2 * options.thickness);
-                }
-                else{
-                    sliderValue.text(textValue);
-                    indicator.text(textValue);
-                }
+                activeHandle.jqueryObject.offset(offsetModifier); // передаем координаты бегунку   
                 
                 // вызываем событие перемещения(передаем координату центра и радиус бегунка )
-                handleMovedEvent(activeHandle.currentPos, _handleWidth / 2);
+                handleMovedEvent(activeHandle.currentPos, _handleWidth / 2, handleMin.currentPos, handleMax.currentPos);
             };
             
             // Обработать перемещение бегунка
             const onHandleMoved = function(pos, rad){
                 // При перемещении надо закрасить слайдер цветом
                 applyColorToSlider(handleMin.currentPos, handleMax.currentPos);
-
+                
                 // при перемещении бегунка переместить индикатор
                 indicatorMoved(activeHandle.currentPos);
+                
+                // вывести значение положения в строке
+                getTextValue(activeHandle.currentPos, handleMin.currentPos, handleMax.currentPos); 
             };
-
+            
             // Закрасить слайдер
             const applyColorToSlider = function(from, to){
                 let colorWidth = to - from;
@@ -187,6 +196,37 @@
                 modifier[_leftPropertyName] = coordinatеs - indicator.outerWidth() / 2;
                 indicator.offset(modifier); //передаем координаты индикатору
             };
+            
+            // вывод текста
+            const getTextValue = function(elementCoordinate, coordinateOne, coordinateTwo){ 
+                
+                let textValueMin = coordinateOne - _sliderMinPos;
+                let textValueMax = coordinateTwo - _sliderMinPos;
+                if(options.isDouble){
+                    if(coordinateTwo === _sliderMaxPos){
+                        minValue.text(textValueMin);
+                        maxValue.text(textValueMax + 2 * options.thickness);
+                        indicator.text(textValueMax + 2 * options.thickness);
+                        indicator.text(textValueMin);
+                    }
+                    else{
+                        minValue.text(textValueMin);
+                        maxValue.text(textValueMax);
+                        indicator.text(textValueMax);
+                        indicator.text(textValueMin);
+                    }
+                }
+                else{
+                    if(coordinateTwo === _sliderMaxPos){
+                        sliderValue.text(textValueMax + 2 * options.thickness);
+                        indicator.text(textValueMax + 2 * options.thickness);
+                    }
+                    else{
+                        sliderValue.text(textValueMax);
+                        indicator.text(textValueMax);
+                    }
+                }
+            };
 
             _handleMovedHandlers.push(onHandleMoved);
 
@@ -197,10 +237,9 @@
                 else {
                     activeHandle = handleMax;
                 }
-
                 handleMin.maxPos = handleMax.currentPos;
                 handleMax.minPos = handleMin.currentPos;
-
+                
                 $(document).on('mousemove', onHandleMove);
 
                 $(document).on('mouseup', function() {
@@ -219,8 +258,8 @@
 })(jQuery);
 
 $('.slider-range-container').mySliderPlugin({indicatorVisibility: true});
-$('.slider-range').mySliderPlugin({isSingle: false, indicatorVisibility: true});
-$('.vertical-slider').mySliderPlugin({isSingle:false, vertical:true, thickness: 15, indicatorVisibility: true});
+$('.slider-range').mySliderPlugin({isDouble: true, indicatorVisibility: true});
+$('.vertical-slider').mySliderPlugin({isDouble:true, vertical:true, thickness: 15, indicatorVisibility: true});
 
 
 
