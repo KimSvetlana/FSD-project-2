@@ -53,5 +53,20 @@
     padding: 8px;
 }
 .slider-scale-values{
-    background-color: darkcyan;
+    /* background-color: #00bcd424; */
+    position: relative;
+    top: 12px;
+    /* height: 10px; */
+}
+.slider-scale-values span{
+    position: absolute;
+    height: 8px;
+    border-left: 1px solid grey;
+}
+.scale-number{
+    position: absolute;
+    top: 10px;
+    left:-5px;
+    line-height: 1;
+    font-size: 10px;
 }
