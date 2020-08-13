@@ -8,7 +8,7 @@
             thickness: 8,
             min: -100,
             max: 100,
-            step: 1,
+            step: 5,
             scaleOfValues: false,
             scaleDivision: 5,
             isDouble: false,
@@ -43,18 +43,7 @@
 
             let handles = $this.find('.slider-range-handle');
 
-            let handleMin = {
-                jqueryObject: handles.first(),
-                getPosition: null,
-                setPosition: null,
-            };
-
-            let handleMax = {
-                ...handleMin,
-                jqueryObject: handles.last(),
-            };
-
-            let activeHandle = handleMax;
+           
 
             // определяем переменные и ориентацию слайдера
             let _leftPropertyName;
@@ -140,52 +129,93 @@
                 _sliderMaxPos = _sliderMinPos + slider.height();
             }
 
-            handleMin.getPosition = function () {
-                // console.log("handleMin offset = " + this.jqueryObject.offset()[_leftPropertyName]);
-                return this.jqueryObject.offset()[_leftPropertyName] + _handleWidth / 2;
-            };
-            handleMax.getPosition = function () {
-                // console.log("handleMax offset = " + this.jqueryObject.offset()[_leftPropertyName]);
-                return this.jqueryObject.offset()[_leftPropertyName] + _handleWidth / 2;
-            };
-            handleMin.setPosition = function (pos, clamp = true) {
-                // Коррекция на доступную область перемещения
-                if (clamp) {
-                    if (pos < _sliderMinPos) {
-                        pos = _sliderMinPos;
-                    }
-                    if (pos > handleMax.getPosition()) {
-                        pos = handleMax.getPosition();
-                    }
+            let handleMin = {
+                jqueryObject: handles.first(),
+                clamp: null,
+                getClosestStepPos: function (pos){
+                    let value = this.posToValue(pos);
+                    value = Math.round(value / options.step) * options.step;
+                    return this.valueToPos(value);
+                },
+                getPosition: function () {
+                    // console.log("handleMin offset = " + this.jqueryObject.offset()[_leftPropertyName]);
+                    return this.jqueryObject.offset()[_leftPropertyName] + _handleWidth / 2;
+                },
+
+                getValue: function(){
+                    return Math.round(this.posToValue(this.getPosition()));
+                },
+
+                setPositionWithoutCorrection: function (pos) {
+                    let offsetModifier = {};
+                    offsetModifier[_leftPropertyName] = pos - _handleWidth / 2;
+                    // console.log("handleMin set offset = " + offsetModifier[_leftPropertyName]);
+                    return this.jqueryObject.offset(offsetModifier)
+                },
+
+                setInitialPosition: function(pos){
+                    this.setPositionWithoutCorrection(pos);
+                },
+
+                setPosition: function (pos) {
+                    console.log("pos before correction: " + pos);
+                    pos = this.getClosestStepPos(pos);
+
+                    // Коррекция на доступную область перемещения
+                    pos = this.clamp(pos);
+
+                    console.log("pos after correction: " + pos);
+
+                    this.setPositionWithoutCorrection(pos);
+                },
+
+                posToValue: function (pos) {                
+                    let proportion = (pos - _sliderMinPos) / (_sliderMaxPos - _sliderMinPos) * (options.max - options.min)
+                    let handleValue = options.min + proportion;
+                    return handleValue;
+                },
+
+                valueToPos: function (value) {
+                    let proportion = (value - options.min) / (options.max - options.min) *(_sliderMaxPos - _sliderMinPos);
+                    return _sliderMinPos + proportion;
                 }
-                let offsetModifier = {};
-                offsetModifier[_leftPropertyName] = pos - _handleWidth / 2;
-                // console.log("handleMin set offset = " + offsetModifier[_leftPropertyName]);
-                return this.jqueryObject.offset(offsetModifier)
             };
-            handleMax.setPosition = function (pos, clamp = true) {
-                let offsetModifier = {};
-                if(clamp){
-                    if (pos > _sliderMaxPos) {
-                        pos = _sliderMaxPos
-                    }
-                    if (pos < handleMin.getPosition()) {
-                        pos = handleMin.getPosition();
-                    }
+
+            let handleMax = {
+                ...handleMin,
+                jqueryObject: handles.last(),
+            };
+
+            const clampValue = (val, minVal, maxVal) => {
+                if (val < minVal){
+                    val = minVal;
                 }
-                offsetModifier[_leftPropertyName] = pos - _handleWidth / 2;
-                // console.log("handleMax set offset = " + offsetModifier[_leftPropertyName]);
-                return this.jqueryObject.offset(offsetModifier)
+
+                if (val > maxVal){
+                    val = maxVal;
+                }
+
+                return val;
             };
+
+            handleMin.clamp = function(pos){
+                return clampValue(pos, _sliderMinPos, handleMax.getPosition());
+            };
+
+            handleMax.clamp = function(pos){
+                return clampValue(pos, handleMin.getPosition(), _sliderMaxPos); 
+            };
+
+            let activeHandle = handleMax;
 
             // console.log("sliderMinPos = " + _sliderMinPos);
             // Начальное положение бегунков
-            handleMin.setPosition(_sliderMinPos, clamp = false);
-            handleMax.setPosition(_sliderMaxPos, clamp = false);
+            handleMin.setInitialPosition(_sliderMinPos);
+            handleMax.setInitialPosition(_sliderMaxPos);
 
             // задаем координаты для второго бегунка при его наличии
             if (!options.isDouble) {
-                handleMax.setPosition(_sliderMinPos, clamp = false);
+                handleMax.setInitialPosition(_sliderMinPos);
                 handleMin.jqueryObject.css("visibility", "hidden");
             }
 
@@ -205,8 +235,8 @@
 
                 // вызываем событие перемещения(передаем координату центра и радиус бегунка )
                 handleMovedEvent({
-                    value: activeHandle.getPosition(),
-                    values: [handleMin.getPosition(), handleMax.getPosition()],
+                    value: activeHandle.getValue(),
+                    values: [handleMin.getValue(), handleMax.getValue()],
                     self: this,
                 });
             };
@@ -240,14 +270,7 @@
 
             // вывод текста индикатора
             const indicatorTextFun = function () {
-                let indicatorText = activeHandle.getPosition() - _sliderMinPos
-
-                if (handleMax.getPosition() === _sliderMaxPos) {
-                    indicator.text(handleMax.getPosition() - _sliderMinPos);
-                }
-                else {
-                    indicator.text(indicatorText);
-                }
+                indicator.text(activeHandle.getValue());
             };
 
             _handleMovedHandlers.push(onHandleMoved);
@@ -285,6 +308,9 @@ $('.slider-range-container').each(function () {
     $this.mySliderPlugin({
         scaleOfValues: true,
         indicatorVisibility: true,
+        min: -50,
+        max: 50,
+        step: 2,
         slideHandler: function (sliderState) {
             $this.next().find('.slider-value').text(`${sliderState.value}`)
         }
