@@ -16,7 +16,7 @@
 }
 .vertical-slider{
     margin-top: 30px;
-    margin-left: 30px;
+    margin-left: 60px;
     width: 150px;
     height: 450px;
 }
@@ -53,20 +53,15 @@
     padding: 8px;
 }
 .slider-scale-values{
-    /* background-color: #00bcd424; */
     position: relative;
-    top: 12px;
-    /* height: 10px; */
+    width: inherit;
+    height: inherit;
 }
 .slider-scale-values span{
-    position: absolute;
-    height: 8px;
-    border-left: 1px solid grey;
+    position: absolute;    
 }
 .scale-number{
     position: absolute;
-    top: 10px;
-    left:-5px;
     line-height: 1;
     font-size: 10px;
 }

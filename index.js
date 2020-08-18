@@ -41,9 +41,7 @@
                 })
             };
 
-            let handles = $this.find('.slider-range-handle');
-
-           
+            let handles = $this.find('.slider-range-handle');           
 
             // определяем переменные и ориентацию слайдера
             let _leftPropertyName;
@@ -81,29 +79,51 @@
             }
             let indicator = $this.find('.indicator');
             let indicatorWidth = indicator.outerWidth();
+            let indicatorHeight = indicator.outerHeight();
             // корректируем положение индикатора
-            indicator.css(_leftPropertyName, (_handleWidth / 2 - indicatorWidth / 2));
+            if(!options.vertical){
+                indicator.css(_leftPropertyName, (- indicatorWidth / 2));
+            }
+            else{
+                indicator.css(_leftPropertyName, (- indicatorHeight / 2));
+                indicator.css(_topPropertyName, '-55px');
+            }
 
             // шкала значений 
             if (options.scaleOfValues) {
-                let wrapScale = "<div class = 'slider-scale-values'></div>";
+                let wrapScale = "<div class='slider-scale-values'></div>";
                 slider.append(wrapScale);
                 let sliderScale = $this.find('.slider-scale-values');
-                
+                sliderScale.css(_topPropertyName, options.thickness * 1.5 );   
+
                 for(let i = 0; i < options.scaleDivision; i++){
-                    sliderScale.append("<span><i class = 'scale-number'></i></span>");
+                    sliderScale.append("<span><i class='scale-number'></i></span>");
                 }
                 
                 let arrSpan = sliderScale.children('span');
+                if(!options.vertical){
+                    arrSpan.css({'border-left': '1px solid grey', 'height' : '8px'});
+                }
+                else{
+                    arrSpan.css({'border-bottom': '1px solid grey', 'width':'8px'});
+                };
+
                 let indicatorLeft = 100 / (arrSpan.length -1);
                 let count = '';
 
                 for(i = 0; i < arrSpan.length; i++){
                     count = `${indicatorLeft * i}%`;
-                    arrSpan.eq(i).css('left', count);
+                    arrSpan.eq(i).css(_leftPropertyName, count);
                 }  
 
                 let arrNumberScale = $this.find('.scale-number');
+
+                if(!options.vertical){
+                    arrNumberScale.css({'top': '10px', 'left' : '-5px'});
+                }
+                else{
+                    arrNumberScale.css({'left': '10px', 'top':'-5px'});
+                };
                 let stepScale = (options.max - options.min) / (options.scaleDivision -1);
                 let scaleValue = 0;
                 for(i = 0; i < arrNumberScale.length; i++){
@@ -324,7 +344,13 @@ $('.slider-range').mySliderPlugin({
         slider.next().find('.slider-value').text('от ' + sliderState.values[0] + ' до ' + sliderState.values[1])
     }
 });
-$('.vertical-slider').mySliderPlugin({ isDouble: true, vertical: true, thickness: 15, indicatorVisibility: true });
+$('.vertical-slider').mySliderPlugin({ 
+    isDouble: true, 
+    vertical: true, 
+    thickness: 15, 
+    indicatorVisibility: true,
+    scaleOfValues: true
+});
 
 
 
