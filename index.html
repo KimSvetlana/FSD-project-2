@@ -1,10 +1,33 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="utf-8">
     <title>Test</title>
     <script src="http://code.jquery.com/jquery-1.12.4.js"></script>
+    <style>
+        .container{
+            width: 100%;
+        }
+        .slider-range-container{
+            width: 450px;
+            margin-top: 50px;
+            margin-left: 30px;
+        }
+        .slider-value-container{
+            margin-top: 20px;
+        }
+        .slider-range{
+            width: 450px;
+            margin-top: 50px;
+            margin-left: 30px;
+        }
+        .vertical-slider{
+            margin-top: 30px;
+            margin-left: 60px;
+            width: 150px;
+            height: 450px;
+        }
+    </style>
    
 </head>
 
@@ -20,6 +43,38 @@
     </div>
     
     <script src='index.js'></script>
+    <script>
+        $('.slider-range-container').each(function () {
+            let $this = $(this);
+            $this.mySliderPlugin({
+                scaleOfValues: true,
+                indicatorVisibility: true,
+                min: -50,
+                max: 50,
+                step: 2,
+                slideHandler: function (sliderState) {
+                    $this.next().find('.slider-value').text(`${sliderState.value}`)
+                }
+            });
+        });
+
+        $('.slider-range').mySliderPlugin({
+            isDouble: true,
+            indicatorVisibility: true,
+            slideHandler: function (sliderState) {
+                let slider = $(sliderState.self);
+                slider.next().find('.slider-value').text('от ' + sliderState.values[0] + ' до ' + sliderState.values[1])
+            }
+        });
+        
+        $('.vertical-slider').mySliderPlugin({ 
+            isDouble: true, 
+            vertical: true, 
+            thickness: 15, 
+            indicatorVisibility: true,
+            scaleOfValues: true
+        });
+    </script>
 
 </body>
 
