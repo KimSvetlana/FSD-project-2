@@ -1,6 +1,8 @@
+import $ from 'jquery';
+global.jQuery = global.$ = $;
+
 (function ($) {
     $.fn.mySliderPlugin = function (options) {
-
         // настройки по умолчанию
         options = $.extend({
             backgroundColor: '#759cd8',
@@ -111,7 +113,7 @@
                 let indicatorLeft = 100 / (arrSpan.length -1);
                 let count = '';
 
-                for(i = 0; i < arrSpan.length; i++){
+                for(let i = 0; i < arrSpan.length; i++){
                     count = `${indicatorLeft * i}%`;
                     arrSpan.eq(i).css(_leftPropertyName, count);
                 }  
@@ -126,7 +128,7 @@
                 };
                 let stepScale = (options.max - options.min) / (options.scaleDivision -1);
                 let scaleValue = 0;
-                for(i = 0; i < arrNumberScale.length; i++){
+                for(let i = 0; i < arrNumberScale.length; i++){
                     scaleValue = options.min + stepScale * i;
                     arrNumberScale.eq(i).text(scaleValue);
                 }                
@@ -178,13 +180,13 @@
                 },
 
                 setPosition: function (pos) {
-                    console.log("pos before correction: " + pos);
+                    //console.log("pos before correction: " + pos);
                     pos = this.getClosestStepPos(pos);
 
                     // Коррекция на доступную область перемещения
                     pos = this.clamp(pos);
 
-                    console.log("pos after correction: " + pos);
+                    //console.log("pos after correction: " + pos);
 
                     this.setPositionWithoutCorrection(pos);
                 },
@@ -321,40 +323,3 @@
     };
 
 })(jQuery);
-
-
-$('.slider-range-container').each(function () {
-    let $this = $(this);
-    $this.mySliderPlugin({
-        scaleOfValues: true,
-        indicatorVisibility: true,
-        min: -50,
-        max: 50,
-        step: 2,
-        slideHandler: function (sliderState) {
-            $this.next().find('.slider-value').text(`${sliderState.value}`)
-        }
-    });
-});
-$('.slider-range').mySliderPlugin({
-    isDouble: true,
-    indicatorVisibility: true,
-    slideHandler: function (sliderState) {
-        let slider = $(sliderState.self);
-        slider.next().find('.slider-value').text('от ' + sliderState.values[0] + ' до ' + sliderState.values[1])
-    }
-});
-$('.vertical-slider').mySliderPlugin({ 
-    isDouble: true, 
-    vertical: true, 
-    thickness: 15, 
-    indicatorVisibility: true,
-    scaleOfValues: true
-});
-
-
-
-// для выбора одного(текущего обЪекта)
-    // $('.example-class').on('mouseenter', event => {
-    //     $(event.currentTarget).addClass('photo-active');
-    // });
