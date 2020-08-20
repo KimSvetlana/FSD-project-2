@@ -1,3 +1,3 @@
-import './js-lib/sliderPlugin';
-import './js-lib/model'
+import './ts-lib/sliderPlugin';
+import './ts-lib/model'
 import './scss/style.scss';
