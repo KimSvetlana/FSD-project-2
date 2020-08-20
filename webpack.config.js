@@ -3,20 +3,22 @@ const webpack = require('webpack');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: './src/index.js',
+    entry: './src/index.ts',
     output: {
         library: 'sliderPlugin',
         libraryTarget: 'umd',
         libraryExport: 'default',
         path: path.resolve(__dirname, 'dist'),
-        filename: 'index.js'
+        filename: 'bundle.js'
     },
     module: {
         rules: [
+            
             {
-                test: /\.js$/,
+                // Include ts, tsx, js, and jsx files.
+                test: /\.(ts|js)x?$/,
                 exclude: /node_modules/,
-                use: ['babel-loader']
+                loader: 'babel-loader',
             },
             {
                 test: /\.scss$/,
@@ -26,8 +28,11 @@ module.exports = {
                     'postcss-loader', 
                     'sass-loader'
                 ]
-            }
+            },
         ]
+    },
+    resolve: {
+        extensions: [ '.tsx', '.ts', '.js' ],
     },
     plugins: [
         new webpack.ProvidePlugin({

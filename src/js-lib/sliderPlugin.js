@@ -1,6 +1,7 @@
 import $ from 'jquery';
 global.jQuery = global.$ = $;
 
+
 (function ($) {
     $.fn.mySliderPlugin = function (options) {
         // настройки по умолчанию
