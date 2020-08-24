@@ -316,6 +316,7 @@ global.jQuery = global.$ = $;
             // Первоначальные действия со слайдером
             handles.on('mousedown', onHandleMouseDown);
             slider.on('click', onHandleMove);
+            
             applyColorToSlider(handleMin.getPosition(), handleMax.getPosition());
 
         };
