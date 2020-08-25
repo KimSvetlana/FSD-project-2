@@ -1,6 +1,6 @@
 import { SignalDispatcher, SimpleEventDispatcher, EventDispatcher } from "strongly-typed-events";
 
-interface IHasValue {
+export interface IHasValue {
   getValue() : number;
 };
 
@@ -25,13 +25,21 @@ export class ISlideEvent {
   }
 }
 
-class HandleState implements IHasValue {
+export class HandleModel implements IHasValue {
   private _value: number;
   private _leftBound: IHasValue;
-  _rightBound: IHasValue;
+  private _rightBound: IHasValue;
+  private _slideEvent = new SimpleEventDispatcher<IHasValue>();
   
+  constructor(initialValue: number) {
+    this._value = initialValue;
+  }
 
-  constructor(leftBound: IHasValue, rightBound: IHasValue) {
+  public get slideEvent() {
+    return this._slideEvent.asEvent();
+  }
+
+  setBounds(leftBound: IHasValue, rightBound: IHasValue) {
     this._leftBound = leftBound;
     this._rightBound = rightBound;
   }
@@ -50,25 +58,32 @@ class HandleState implements IHasValue {
     }
 
     this._value = newValue;
+    this._slideEvent.dispatch(this);
   }
 };
 
 export class SliderModel {
-  private _minHandle: HandleState;
-  private _maxHandle: HandleState;
-  private _activeHandle: HandleState;
+  private _minHandle: HandleModel;
+  private _maxHandle: HandleModel;
+  private _activeHandle: HandleModel;
   private _minValue: number;
   private _maxValue: number;
   private _step: number;
   private _isDouble: boolean;
   private _slideEvent = new SimpleEventDispatcher<ISlideEvent>();
 
-  constructor() {
-    this._minHandle = new HandleState(new StaticValue(this._minValue), this._maxHandle);
-    this._maxHandle = new HandleState(this._minHandle, new StaticValue(this._maxValue));
+  constructor(options) {
+    this._minValue = options.min;
+    this._maxValue = options.max;
+    this._step = options.step;
+    
+    this._minHandle = new HandleModel(options.min);
+    this._maxHandle = new HandleModel(options.max);
+    this._minHandle.setBounds(new StaticValue(this._minValue), this._maxHandle);
+    this._maxHandle.setBounds(this._minHandle, new StaticValue(this._maxValue));
   }
 
-  getSliderValues() {
+  getSliderHandles() {
     return [this._minHandle, this._maxHandle];
   }
 
@@ -87,7 +102,7 @@ export class SliderModel {
 
 
   // setSliderValues(){
-
+    
   // }
  
 };

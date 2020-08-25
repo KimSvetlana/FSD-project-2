@@ -4,7 +4,7 @@ global.jQuery = global.$ = $;
 import './scss/style.scss';
 import {SliderModel} from'./ts-lib/model'
 import { View } from './ts-lib/view';
-
+import {Controller} from './ts-lib/controller'
 (function ($) {
     $.fn.mySliderPlugin = function (options) {
         // настройки по умолчанию
@@ -24,13 +24,11 @@ import { View } from './ts-lib/view';
         }, options);
 
         const makeSliderFunction = function () {
-
             let $this = $(this);
-            let model = new SliderModel();
+            let model = new SliderModel(options);
             let view = new View(model, options, $this);
-            let controller = new Object();
+            let controller = new Controller(model, view.minHandle.handleObject, view.maxHandle.handleObject, options, view.minBounds, view.maxBounds);
         };
-
     return this.each(makeSliderFunction);
 };
 

@@ -1,22 +1,66 @@
-import {HandleState, SliderModel} from './model';
+import {HandleModel, SliderModel} from './model';
 import{View} from './view'
 
-class Controller {
-    model: SliderModel;
-    myView : View;
-    constructor(model: SliderModel, myView: View) {
-      this.model = model;
-      this.myView = myView;
+export class Controller {
+  private _model: SliderModel;
+  private _options: any;
+  private _activeHandle: HandleModel;
+  private _handleMinObject: object;
+  private _handleMaxObject: object;
+
+  private _minBounds;
+  private _maxBounds;
+
+  constructor(model: SliderModel, handleMinObject, handleMaxObject, options, minBounds, maxBounds) {
+    this._model = model;
+    this._options = options;
+    this._handleMinObject = handleMinObject;
+    this._handleMaxObject = handleMaxObject;
+
+    this._minBounds = minBounds;
+    this._maxBounds = maxBounds;
+
+    let self = this;
+    let sliderHandles = self._model.getSliderHandles();
+    let minHandle = sliderHandles[0];
+    let maxHandle = sliderHandles[1];
+    minHandle.setValue(options.min);
+    maxHandle.setValue(options.max);
+
+    this._handleMinObject.on("mousedown", function (mouseEvent) {
+      self._onHandleMouseDown(sliderHandles[0]);
+    });
+
+    this._handleMaxObject.on("mousedown", function (mouseEvent) {
+      self._onHandleMouseDown(sliderHandles[1]);
+    });
+
+
+  }
+
+  _onHandleMouseDown(handle: HandleModel) {
+    this._activeHandle = handle;
+    let self = this;
+    $(document).on('mousemove', function(movePosition) {
+      self._onMouseMove(movePosition);
+    });
+    
+    $(document).on('mouseup', function () {
+      $(document).off('mousemove');
+    })
+  }
+
+  _onMouseMove(movePosition) {
+    let movePos;
+    if (this._options.vertical) {
+        movePos = movePosition.pageY;
+    }
+    else {
+        movePos = movePosition.pageX;
     }
 
-    // onHandleMouseDown(mouseEvent) :void {
-
-    //     $(document).on('mousemove', function () { this.myView.OnHandleMove(); });
-
-    //     $(document).on('mouseup', function () {
-    //         $(document).off('mousemove');
-    //     })
-    // }   
-    // this.myView.handles.on('mousedown', Controller.onHandleMouseDown);
-    // this.myView.slider.on('click', this.myView.onHandleMove);
-};
+    let proportion = (movePos - this._minBounds) / (this._maxBounds - this._minBounds);
+    let value = this._options.min + proportion * (this._options.max - this._options.min);
+    this._activeHandle.setValue(value);
+  } 
+}  

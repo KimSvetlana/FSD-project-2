@@ -1,4 +1,4 @@
-import {ISlideEvent, SliderModel} from './model';
+import {IHasValue, SliderModel} from './model';
 
 
 class HandleView {
@@ -25,6 +25,9 @@ class HandleView {
             this._handleObject.css("left", -thickness / 2);
         }
     } 
+    get handleObject(){
+        return this._handleObject;
+    }
 
     hide(){
         this._handleObject.css("visibility", 'hidden');
@@ -35,26 +38,34 @@ class HandleView {
         this._maxOffset = maxOffset;
     }
 
+    get minBounds(){
+        return this._minOffset;
+    }
+    get maxBounds(){
+        return this._maxOffset;
+    }
+
     setRange(minValue, maxValue){
         this._minValue = minValue;
         this._maxValue = maxValue;
     }
 
-    
-
     setOffsetFromValue(sliderValue: number) {
-        let proportion = (sliderValue - this._minValue) / (this._maxValue - this._minValue) ;
+        let proportion = (sliderValue - this._minValue) / (this._maxValue - this._minValue);
         let offset = this._minOffset + proportion * (this._maxOffset - this._minOffset);
 
         // корректировка относительно центра бегунка
         offset -= this._handleWidth / 2;
+        let offsetModifier = {};
 
         if(this._vertical){
-            this._handleObject.css('top', offset);        
+            offsetModifier["top"] = offset;
         }
         else{
-            this._handleObject.css('left', offset);
-        }        
+            offsetModifier["left"] = offset;
+        }
+        
+        this._handleObject.offset(offsetModifier);
     }
 
     getOffset(): number {
@@ -96,23 +107,41 @@ class ScaleView {
 }
 
 export class View {
-    _minHandle: HandleView;
-    _maxHandle: HandleView;
-    _indicator: IndicatorView;
-    _scale: ScaleView;
-    _colorRange: ColorRangeView;
+    private _minHandle: HandleView;
+    private _maxHandle: HandleView;
+    private _indicator: IndicatorView;
+    private _scale: ScaleView;
+    private _colorRange: ColorRangeView;
 
-
-    constructor(model, options, $this){
+    private _minBounds: number;
+    private _maxBounds: number;
+    constructor(model: SliderModel, options, $this){
         this.initialize(options, $this);
 
-        model.slideEvent.subscribe((e: ISlideEvent) => {
-            this._onSlideEvent(e);
-            // let slideValue = model.sliderValue;
-            // model.sliderValue = 5;
+        let handleModels = model.getSliderHandles();
+        handleModels[0].slideEvent.subscribe((value: IHasValue) => {
+            this._onSlideEvent(this._minHandle, value);
+        });
+
+        handleModels[1].slideEvent.subscribe((value: IHasValue) => {
+            this._onSlideEvent(this._maxHandle, value);
         });
     }
 
+    get minHandle(){
+        return this._minHandle;
+    }
+
+    get maxHandle(){
+        return this._maxHandle;
+    }
+
+    get minBounds(){
+        return this._minBounds;
+    }
+    get maxBounds(){
+        return this._maxBounds;
+    }
     private initialize(options, $this) {
 
         let content = "<div class='slider-range-content'>" +
@@ -124,13 +153,13 @@ export class View {
         $this.append(content);
 
         // параметры слайдера
-        let slider = $this.find("slider-range-content");
+        let slider = $this.find(".slider-range-content");
         if(!options.vertical){
             slider.css("height", options.thickness);
             slider.css("width", options.expansion);
         }
         else{
-            slider.css("width,",options.thickness);
+            slider.css("width", options.thickness);
             slider.css("height", options.expansion);
         }
 
@@ -143,8 +172,11 @@ export class View {
         }
         else {
             maxOffset = slider.offset().top;
-            minOffset = minOffset + slider.height();
+            minOffset = maxOffset + slider.height();
         }
+
+        this._minBounds = minOffset;
+        this._maxBounds = maxOffset;
 
         let handles = $this.find('.slider-range-handle');
 
@@ -157,31 +189,23 @@ export class View {
         this._minHandle.setRange(options.min, options.max);
         this._maxHandle.setRange(options.min, options.max);
 
-        // задаем координаты для второго бегунка при его наличии
+        // Начальное положение бегунков
+        this._minHandle.setOffsetFromValue(options.min);
+        this._maxHandle.setOffsetFromValue(options.max);
+
+        // если бегунок один, то скрываем один из бегунков(minHandle)
         if (!options.isDouble) {
-            this._maxHandle.setOffsetFromValue(options.max);
+            this._maxHandle.setOffsetFromValue(options.min);
             this._minHandle.hide();
-        }
-        
+        }        
     }
 
-    private _onSlideEvent(e: ISlideEvent){
-        let minHandleValue = e.minHandle.getValue();
-        let maxHandleValue = e.maxHandle.getValue();
-
-
-        this._minHandle.setOffsetFromValue(e.minHandle.getValue());
-        let offset = this._minHandle.getOffset();
-        this._colorRange.doColor(this._minHandle.getOffset(), this._maxHandle.getOffset());
+    private _onSlideEvent(view: HandleView, value: IHasValue){
+        view.setOffsetFromValue(value.getValue());
+        //this._colorRange.doColor(this._minHandle.getOffset(), this._maxHandle.getOffset());
         // convert value to offset
         // .css
         // indicator
         // color range
     }
-
-    
-
-    
-
-
 }
