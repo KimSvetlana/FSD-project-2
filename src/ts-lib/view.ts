@@ -1,5 +1,21 @@
 import {IHasValue, SliderModel} from './model';
 
+class OrientedPropertyNames{
+    public width: string;
+    public height: string;
+    public left: string;
+    public top: string;
+
+    constructor(vertical: boolean){
+        if (vertical){
+
+        }
+        else{
+            
+        }
+    }
+}
+
 
 class HandleView {
     private _handleObject: object;
@@ -69,8 +85,12 @@ class HandleView {
     }
 
     getOffset(): number {
-        return 0;
-        // .css
+        if (this._vertical){
+            return this._handleObject.offset().top + this._handleWidth / 2;
+        }
+        else {
+            return this._handleObject.offset().left + this._handleWidth / 2;
+        }
     }
 }
 
@@ -87,10 +107,40 @@ class IndicatorView {
 }
 
 class ColorRangeView {
-    _colorRangeObject: object;
+    private _colorRangeObject: object;
+    private _vertical: boolean;
+    
+    constructor(colorRangeObject: object, options: object){
+        this._colorRangeObject = colorRangeObject;
+        this._vertical = options.vertical;
+        colorRangeObject.css('background-color', options.backgroundColor);
+        if (options.vertical){
+            colorRangeObject.css('width', options.thickness);
+        }
+        else {
+            colorRangeObject.css('height', options.thickness);
+        }
+    }
 
     doColor(fromOffset: number, toOffset: number) {
-
+        if (fromOffset > toOffset){
+            [fromOffset, toOffset] = [toOffset, fromOffset];
+        }
+        console.log("from " + fromOffset + " to " + toOffset);       
+        let offsetModifier = {};
+        let widthPropertyName = '';
+        if(this._vertical){
+            offsetModifier['top'] = fromOffset;
+            widthPropertyName = 'height';
+        }
+        else {
+            offsetModifier['left'] = fromOffset 
+            widthPropertyName = 'width';
+        }
+        this._colorRangeObject.offset(offsetModifier);
+        
+        let width = toOffset - fromOffset;
+        this._colorRangeObject.css(widthPropertyName, width);
     }
 }
 
@@ -154,6 +204,7 @@ export class View {
 
         // параметры слайдера
         let slider = $this.find(".slider-range-content");
+    
         if(!options.vertical){
             slider.css("height", options.thickness);
             slider.css("width", options.expansion);
@@ -197,15 +248,20 @@ export class View {
         if (!options.isDouble) {
             this._maxHandle.setOffsetFromValue(options.min);
             this._minHandle.hide();
-        }        
+        }  
+        
+        let colorRangeObject = $this.find('.slider-color-range');
+        this._colorRange = new ColorRangeView(colorRangeObject, options);
     }
+
+
 
     private _onSlideEvent(view: HandleView, value: IHasValue){
         view.setOffsetFromValue(value.getValue());
-        //this._colorRange.doColor(this._minHandle.getOffset(), this._maxHandle.getOffset());
+        this._colorRange.doColor(this._minHandle.getOffset(), this._maxHandle.getOffset());
         // convert value to offset
         // .css
         // indicator
-        // color range
+        
     }
 }
