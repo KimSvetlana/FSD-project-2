@@ -2,20 +2,20 @@ import {IHasValue, SliderModel} from './model';
 
 class OrientedPropertyNames{
     private _widthPropertyName: string;
-    private _thicknessPropertyName: string;
+    private _heightPropertyName: string;
     private _leftPropertyName: string;
     private _topPropertyName: string;
 
     constructor(vertical: boolean) {
         if (vertical) {
             this._widthPropertyName = 'height';
-            this._thicknessPropertyName = 'width';
+            this._heightPropertyName = 'width';
             this._leftPropertyName = 'top';
             this._topPropertyName = 'left'
         }
         else {
             this._widthPropertyName = 'width';
-            this._thicknessPropertyName = 'height';
+            this._heightPropertyName = 'height';
             this._leftPropertyName = 'left';
             this._topPropertyName = 'top';
         }
@@ -25,8 +25,8 @@ class OrientedPropertyNames{
         return this._widthPropertyName;
     }
 
-    public get thicknessPropertyName() {
-        return this._thicknessPropertyName;
+    public get heightPropertyName() {
+        return this._heightPropertyName;
     }
 
     public get leftPropertyName() {
@@ -110,29 +110,52 @@ class IndicatorView {
     private _indicatorObject: object;
     private _indicatorWidth: number;
     private _indicatorHeight: number;
-    private _vertical: boolean;
+    private _options: object;
 
     constructor(indicatorObject: Object, options: Object){
         this._indicatorObject = indicatorObject;
+        this._options = options;
         this._indicatorWidth = this._indicatorObject.outerWidth();
         this._indicatorHeight = this._indicatorObject.outerHeight();
 
         this._oriented = new OrientedPropertyNames(options.vertical);
-        this._vertical = options.vertical;
+    }
 
-        // корректируем положение индикатора относительно центра рукоятки
-        this._indicatorObject.css(this._oriented.leftPropertyName, (- this._indicatorWidth / 2));
-        if(this._vertical){
-            this._indicatorObject.css('left', '-55px');
+    private getOrientedHeight() {
+        if (this._options.vertical) {
+            return this._indicatorObject.outerWidth();
         }
+        else {
+            return this._indicatorObject.outerHeight();
+        }
+        //return Number.parseInt(this._indicatorObject.css(this._oriented.heightPropertyName));
+    }
+
+    private getOrientedWidth() {
+        if (this._options.vertical) {
+            return this._indicatorObject.outerHeight();
+        }
+        else {
+            return this._indicatorObject.outerWidth();
+        }
+        //return Number.parseInt(this._indicatorObject.css(this._oriented.widthPropertyName));
     }
 
     // перемещаем индикатор
     show(offset: number, text: number) {
-        let modifier = {};
-        modifier[this._oriented.leftPropertyName] = offset - this._indicatorWidth / 2;
-        this._indicatorObject.offset(modifier); //передаем координаты индикатору
+
         this._indicatorObject.text(text);
+
+        // корректируем положение индикатора относительно центра
+        let correction = - this.getOrientedWidth() / 2;
+
+         // отступ от консоли
+         let margin = - (this.getOrientedHeight() + this._options.thickness);
+         this._indicatorObject.css(this._oriented.topPropertyName, margin);
+
+        let modifier = {};
+        modifier[this._oriented.leftPropertyName] = offset + correction;
+        this._indicatorObject.offset(modifier); //передаем координаты индикатору
     };
 }
 
@@ -145,7 +168,7 @@ class ColorRangeView {
         this._oriented = new OrientedPropertyNames(options.vertical);
 
         colorRangeObject.css('background-color', options.backgroundColor);
-        colorRangeObject.css(this._oriented.thicknessPropertyName, options.thickness);
+        colorRangeObject.css(this._oriented.heightPropertyName, options.thickness);
     }
 
     doColor(fromOffset: number, toOffset: number) {
@@ -278,7 +301,7 @@ export class View {
         let slider = $this.find(".slider-range-content");
 
         slider.css(this._oriented.widthPropertyName, options.expansion);
-        slider.css(this._oriented.thicknessPropertyName, options.thickness)
+        slider.css(this._oriented.heightPropertyName, options.thickness)
 
         // зная все размеры, можно уточнить границы слайдера
         let minOffset;
