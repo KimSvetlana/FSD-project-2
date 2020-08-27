@@ -30,21 +30,18 @@ class HandleView {
     private _maxValue: number;
     private _minValue: number;
     private _handleWidth: number;
+    private _oriented: OrientedPropertyNames;
 
     constructor(handleObject: object, vertical: boolean, thickness : number){
         this._handleObject = handleObject;
         this._handleWidth = thickness * 2;
         this._vertical = vertical;
+        this._oriented = new OrientedPropertyNames(vertical);
 
         // параметры и расположение бегунка
         this._handleObject.css({ 'width': this._handleWidth, 'height': this._handleWidth });
         // выравнивание бегунка относительно кулисы
-        if (!this._vertical) {
-            this._handleObject.css("top", -thickness / 2);
-        }
-        else {
-            this._handleObject.css("left", -thickness / 2);
-        }
+        this._handleObject.css(this._oriented._topPropertyName, -thickness / 2);
     }
     get handleObject(){
         return this._handleObject;
@@ -78,14 +75,7 @@ class HandleView {
         // корректировка относительно центра бегунка
         offset -= this._handleWidth / 2;
         let offsetModifier = {};
-
-        if(this._vertical){
-            offsetModifier["top"] = offset;
-        }
-        else{
-            offsetModifier["left"] = offset;
-        }
-
+        offsetModifier[this._oriented._leftPropertyName] = offset;
         this._handleObject.offset(offsetModifier);
     }
 
@@ -197,7 +187,7 @@ class ScaleView {
 
         let stepScale = (options.max - options.min) / (options.scaleDivision -1);
         let scaleValue = 0;
-        
+
         for(let i = 0; i < arrNumberScale.length; i++){
             scaleValue = options.min + stepScale * i;
             if(options.vertical){
