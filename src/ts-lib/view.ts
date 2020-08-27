@@ -131,19 +131,15 @@ class IndicatorView {
 }
 
 class ColorRangeView {
+    private _oriented: OrientedPropertyNames;
     private _colorRangeObject: object;
-    private _vertical: boolean;
 
     constructor(colorRangeObject: object, options: object){
         this._colorRangeObject = colorRangeObject;
-        this._vertical = options.vertical;
+        this._oriented = new OrientedPropertyNames(options.vertical);
+
         colorRangeObject.css('background-color', options.backgroundColor);
-        if (options.vertical){
-            colorRangeObject.css('width', options.thickness);
-        }
-        else {
-            colorRangeObject.css('height', options.thickness);
-        }
+        colorRangeObject.css(this._oriented._thicknessPropertyName, options.thickness);
     }
 
     doColor(fromOffset: number, toOffset: number) {
@@ -151,19 +147,11 @@ class ColorRangeView {
             [fromOffset, toOffset] = [toOffset, fromOffset];
         }
         let offsetModifier = {};
-        let widthPropertyName = '';
-        if(this._vertical){
-            offsetModifier['top'] = fromOffset;
-            widthPropertyName = 'height';
-        }
-        else {
-            offsetModifier['left'] = fromOffset
-            widthPropertyName = 'width';
-        }
+        offsetModifier[this._oriented._leftPropertyName] = fromOffset;
         this._colorRangeObject.offset(offsetModifier);
 
         let width = toOffset - fromOffset;
-        this._colorRangeObject.css(widthPropertyName, width);
+        this._colorRangeObject.css(this._oriented._widthPropertyName, width);
     }
 }
 
