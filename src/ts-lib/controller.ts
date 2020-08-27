@@ -34,8 +34,6 @@ export class Controller {
     this._handleMaxObject.on("mousedown", function (mouseEvent) {
       self._onHandleMouseDown(sliderHandles[1]);
     });
-
-
   }
 
   _onHandleMouseDown(handle: HandleModel) {

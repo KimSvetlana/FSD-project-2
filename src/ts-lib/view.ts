@@ -16,7 +16,6 @@ class OrientedPropertyNames{
     }
 }
 
-
 class HandleView {
     private _handleObject: object;
     private _vertical: boolean;
@@ -95,15 +94,41 @@ class HandleView {
 }
 
 class IndicatorView {
-    _indicatorObject: object;
+    private _indicatorObject: object;
+    private _indicatorWidth: number;
+    private _indicatorHeight: number;
+    private _vertical: boolean;
 
-    setOffset() {
-
+    constructor(indicatorObject: Object, options: Object){
+        this._indicatorObject = indicatorObject;
+        this._indicatorWidth = this._indicatorObject.outerWidth();
+        this._indicatorHeight = this._indicatorObject.outerHeight();
+        this._vertical = options.vertical;
+        
+        // корректируем положение индикатора относительно центра рукоятки 
+        if(!this._vertical){
+            this._indicatorObject.css('left', (- this._indicatorWidth / 2));
+        }
+        else{
+            this._indicatorObject.css('top', (- this._indicatorHeight / 2));
+            this._indicatorObject.css('left', '-55px');
+        }
     }
 
-    setValue() {
-
-    }
+    // перемещаем индикатор
+    show(offset: number, text: number) {
+        let modifier = {};
+        let propertyName = '';
+        if(this._vertical){
+            propertyName = 'top';
+        }
+        else{
+            propertyName = 'left';
+        }
+        modifier[propertyName] = offset - this._indicatorWidth / 2;
+        this._indicatorObject.offset(modifier); //передаем координаты индикатору
+        this._indicatorObject.text(text);
+    };
 }
 
 class ColorRangeView {
@@ -147,6 +172,60 @@ class ColorRangeView {
 class ScaleView {
     _scaleObject: object;
 
+    constructor(sliderObject, options){
+        this._scaleObject = sliderObject;
+        if(options.vertical){
+            this._scaleObject.css('left', options.thickness * 1.5 );
+        }
+        else{
+            this._scaleObject.css('top', options.thickness * 1.5 );
+        }
+
+        for(let i = 0; i < options.scaleDivision; i++){
+            this._scaleObject.append("<span><i class='scale-number'></i></span>");
+        }
+        
+        let arrSpan = this._scaleObject.children('span');
+        if(!options.vertical){
+            arrSpan.css({'border-left': '1px solid grey', 'height' : '8px'});
+        }
+        else{
+            arrSpan.css({'border-bottom': '1px solid grey', 'width':'8px'});
+        };
+
+        let indicatorLeft = 100 / (arrSpan.length -1);
+        let count = '';
+
+        for(let i = 0; i < arrSpan.length; i++){
+            count = `${indicatorLeft * i}%`;
+            if(options.vertical){
+                arrSpan.eq(i).css('top', count);
+            }
+            else{
+                arrSpan.eq(i).css('left', count);
+            }
+        }  
+
+        let arrNumberScale = this._scaleObject.find('.scale-number');
+        if(!options.vertical){
+            arrNumberScale.css({'top': '10px', 'left' : '-5px'});
+        }
+        else{
+            arrNumberScale.css({'left': '10px', 'top':'-5px'});
+        };
+        let stepScale = (options.max - options.min) / (options.scaleDivision -1);
+        let scaleValue = 0;
+        for(let i = 0; i < arrNumberScale.length; i++){
+            scaleValue = options.min + stepScale * i;
+            if(options.vertical){
+                arrNumberScale.eq(i).text(-scaleValue);
+            }
+            else{
+                arrNumberScale.eq(i).text(scaleValue);
+            }
+        }                
+    }
+
     setStep(stepValue: number) {
 
     }
@@ -166,6 +245,7 @@ export class View {
     private _minBounds: number;
     private _maxBounds: number;
     constructor(model: SliderModel, options, $this){
+
         this.initialize(options, $this);
 
         let handleModels = model.getSliderHandles();
@@ -250,15 +330,34 @@ export class View {
             this._minHandle.hide();
         }  
         
+        // закраска слайдера
         let colorRangeObject = $this.find('.slider-color-range');
         this._colorRange = new ColorRangeView(colorRangeObject, options);
+
+        // индикатор
+        let indicatorContent = "<span class='indicator'>0</span>";
+        if (options.indicatorVisibility) {
+            slider.append(indicatorContent);
+        }
+        let indicatorObject = $this.find('.indicator');
+        console.log(indicatorObject);
+        this._indicator = new IndicatorView(indicatorObject, options);
+        this._indicator.show(this._maxHandle.getOffset(), options.max);
+
+        // шкала значений
+        let wrapScale = "<div class='slider-scale-values'></div>"
+        if (options.scaleOfValues){
+            slider.append(wrapScale);
+        }
+        let sliderScale = $this.find('.slider-scale-values');
+        this._scale = new ScaleView(sliderScale, options);
     }
 
-
-
-    private _onSlideEvent(view: HandleView, value: IHasValue){
-        view.setOffsetFromValue(value.getValue());
+    private _onSlideEvent(handle: HandleView, value: IHasValue){
+        handle.setOffsetFromValue(value.getValue());
         this._colorRange.doColor(this._minHandle.getOffset(), this._maxHandle.getOffset());
+        this._indicator.show(handle.getOffset(), value.getValue());
+
         // convert value to offset
         // .css
         // indicator

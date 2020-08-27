@@ -27,6 +27,7 @@ export class ISlideEvent {
 
 export class HandleModel implements IHasValue {
   private _value: number;
+  private _step: number;
   private _leftBound: IHasValue;
   private _rightBound: IHasValue;
   private _slideEvent = new SimpleEventDispatcher<IHasValue>();
@@ -39,6 +40,10 @@ export class HandleModel implements IHasValue {
     return this._slideEvent.asEvent();
   }
 
+  setStep(step) {
+    this._step = step;
+  }
+
   setBounds(leftBound: IHasValue, rightBound: IHasValue) {
     this._leftBound = leftBound;
     this._rightBound = rightBound;
@@ -49,6 +54,8 @@ export class HandleModel implements IHasValue {
   }
 
   setValue(newValue: number) : void {
+    newValue = Math.round(newValue / this._step) * this._step;
+
     if (newValue < this._leftBound.getValue()){
       newValue = this._leftBound.getValue();
     }
@@ -81,6 +88,8 @@ export class SliderModel {
     this._maxHandle = new HandleModel(options.max);
     this._minHandle.setBounds(new StaticValue(this._minValue), this._maxHandle);
     this._maxHandle.setBounds(this._minHandle, new StaticValue(this._maxValue));
+    this._minHandle.setStep(this._step);
+    this._maxHandle.setStep(this._step);
   }
 
   getSliderHandles() {
@@ -100,9 +109,8 @@ export class SliderModel {
     return this._slideEvent.asEvent();
   }
 
-
-  // setSliderValues(){
+  setSliderValues(){
     
-  // }
+  }
  
 };
