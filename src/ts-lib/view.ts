@@ -1,10 +1,10 @@
 import {IHasValue, SliderModel} from './model';
 
 class OrientedPropertyNames{
-    public _widthPropertyName: string;
-    public _thicknessPropertyName: string;
-    public _leftPropertyName: string;
-    public _topPropertyName: string;
+    private _widthPropertyName: string;
+    private _thicknessPropertyName: string;
+    private _leftPropertyName: string;
+    private _topPropertyName: string;
 
     constructor(vertical: boolean) {
         if (vertical) {
@@ -19,6 +19,22 @@ class OrientedPropertyNames{
             this._leftPropertyName = 'left';
             this._topPropertyName = 'top';
         }
+    }
+
+    public get widthPropertyName(){
+        return this._widthPropertyName;
+    }
+
+    public get thicknessPropertyName() {
+        return this._thicknessPropertyName;
+    }
+
+    public get leftPropertyName() {
+        return this._leftPropertyName;
+    }
+
+    public  get topPropertyName() {
+        return this._topPropertyName;
     }
 }
 
@@ -41,7 +57,7 @@ class HandleView {
         // параметры и расположение бегунка
         this._handleObject.css({ 'width': this._handleWidth, 'height': this._handleWidth });
         // выравнивание бегунка относительно кулисы
-        this._handleObject.css(this._oriented._topPropertyName, -thickness / 2);
+        this._handleObject.css(this._oriented.topPropertyName, -thickness / 2);
     }
     get handleObject(){
         return this._handleObject;
@@ -75,7 +91,7 @@ class HandleView {
         // корректировка относительно центра бегунка
         offset -= this._handleWidth / 2;
         let offsetModifier = {};
-        offsetModifier[this._oriented._leftPropertyName] = offset;
+        offsetModifier[this._oriented.leftPropertyName] = offset;
         this._handleObject.offset(offsetModifier);
     }
 
@@ -105,7 +121,7 @@ class IndicatorView {
         this._vertical = options.vertical;
 
         // корректируем положение индикатора относительно центра рукоятки
-        this._indicatorObject.css(this._oriented._leftPropertyName, (- this._indicatorWidth / 2));
+        this._indicatorObject.css(this._oriented.leftPropertyName, (- this._indicatorWidth / 2));
         if(this._vertical){
             this._indicatorObject.css('left', '-55px');
         }
@@ -114,7 +130,7 @@ class IndicatorView {
     // перемещаем индикатор
     show(offset: number, text: number) {
         let modifier = {};
-        modifier[this._oriented._leftPropertyName] = offset - this._indicatorWidth / 2;
+        modifier[this._oriented.leftPropertyName] = offset - this._indicatorWidth / 2;
         this._indicatorObject.offset(modifier); //передаем координаты индикатору
         this._indicatorObject.text(text);
     };
@@ -129,7 +145,7 @@ class ColorRangeView {
         this._oriented = new OrientedPropertyNames(options.vertical);
 
         colorRangeObject.css('background-color', options.backgroundColor);
-        colorRangeObject.css(this._oriented._thicknessPropertyName, options.thickness);
+        colorRangeObject.css(this._oriented.thicknessPropertyName, options.thickness);
     }
 
     doColor(fromOffset: number, toOffset: number) {
@@ -137,11 +153,11 @@ class ColorRangeView {
             [fromOffset, toOffset] = [toOffset, fromOffset];
         }
         let offsetModifier = {};
-        offsetModifier[this._oriented._leftPropertyName] = fromOffset;
+        offsetModifier[this._oriented.leftPropertyName] = fromOffset;
         this._colorRangeObject.offset(offsetModifier);
 
         let width = toOffset - fromOffset;
-        this._colorRangeObject.css(this._oriented._widthPropertyName, width);
+        this._colorRangeObject.css(this._oriented.widthPropertyName, width);
     }
 }
 
@@ -153,7 +169,7 @@ class ScaleView {
         this._scaleObject = sliderObject;
         this._oriented = new OrientedPropertyNames(options.vertical);
 
-        this._scaleObject.css(this._oriented._topPropertyName, options.thickness * 1.5 );
+        this._scaleObject.css(this._oriented.topPropertyName, options.thickness * 1.5 );
 
         for(let i = 0; i < options.scaleDivision; i++){
             this._scaleObject.append("<span><i class='scale-number'></i></span>");
@@ -173,7 +189,7 @@ class ScaleView {
 
         for(let i = 0; i < arrSpan.length; i++){
             count = `${indicatorLeft * i}%`;
-            arrSpan.eq(i).css(this._oriented._leftPropertyName, count);
+            arrSpan.eq(i).css(this._oriented.leftPropertyName, count);
         }
 
         let arrNumberScale = this._scaleObject.find('.scale-number');
@@ -261,8 +277,8 @@ export class View {
         // параметры слайдера
         let slider = $this.find(".slider-range-content");
 
-        slider.css(this._oriented._widthPropertyName, options.expansion);
-        slider.css(this._oriented._thicknessPropertyName, options.thickness)
+        slider.css(this._oriented.widthPropertyName, options.expansion);
+        slider.css(this._oriented.thicknessPropertyName, options.thickness)
 
         // зная все размеры, можно уточнить границы слайдера
         let minOffset;
