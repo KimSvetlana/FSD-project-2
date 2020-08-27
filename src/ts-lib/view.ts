@@ -156,22 +156,21 @@ class ColorRangeView {
 }
 
 class ScaleView {
-    _scaleObject: object;
+    private _oriented: OrientedPropertyNames;
+    private _scaleObject: object;
 
     constructor(sliderObject, options){
         this._scaleObject = sliderObject;
-        if(options.vertical){
-            this._scaleObject.css('left', options.thickness * 1.5 );
-        }
-        else{
-            this._scaleObject.css('top', options.thickness * 1.5 );
-        }
+        this._oriented = new OrientedPropertyNames(options.vertical);
+
+        this._scaleObject.css(this._oriented._topPropertyName, options.thickness * 1.5 );
 
         for(let i = 0; i < options.scaleDivision; i++){
             this._scaleObject.append("<span><i class='scale-number'></i></span>");
         }
 
         let arrSpan = this._scaleObject.children('span');
+
         if(!options.vertical){
             arrSpan.css({'border-left': '1px solid grey', 'height' : '8px'});
         }
@@ -184,23 +183,21 @@ class ScaleView {
 
         for(let i = 0; i < arrSpan.length; i++){
             count = `${indicatorLeft * i}%`;
-            if(options.vertical){
-                arrSpan.eq(i).css('top', count);
-            }
-            else{
-                arrSpan.eq(i).css('left', count);
-            }
+            arrSpan.eq(i).css(this._oriented._leftPropertyName, count);
         }
 
         let arrNumberScale = this._scaleObject.find('.scale-number');
+
         if(!options.vertical){
             arrNumberScale.css({'top': '10px', 'left' : '-5px'});
         }
         else{
             arrNumberScale.css({'left': '10px', 'top':'-5px'});
         };
+
         let stepScale = (options.max - options.min) / (options.scaleDivision -1);
         let scaleValue = 0;
+        
         for(let i = 0; i < arrNumberScale.length; i++){
             scaleValue = options.min + stepScale * i;
             if(options.vertical){
@@ -273,15 +270,6 @@ export class View {
 
         // параметры слайдера
         let slider = $this.find(".slider-range-content");
-
-        // if(!options.vertical){
-        //     slider.css("width", options.expansion);
-        //     slider.css("height", options.thickness);
-        // }
-        // else{
-        //     slider.css("width", options.thickness);
-        //     slider.css("height", options.expansion);
-        // }
 
         slider.css(this._oriented._widthPropertyName, options.expansion);
         slider.css(this._oriented._thicknessPropertyName, options.thickness)
