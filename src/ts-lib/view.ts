@@ -1,17 +1,23 @@
 import {IHasValue, SliderModel} from './model';
 
 class OrientedPropertyNames{
-    public width: string;
-    public height: string;
-    public left: string;
-    public top: string;
+    public _widthPropertyName: string;
+    public _thicknessPropertyName: string;
+    public _leftPropertyName: string;
+    public _topPropertyName: string;
 
-    constructor(vertical: boolean){
-        if (vertical){
-
+    constructor(vertical: boolean) {
+        if (vertical) {
+            this._widthPropertyName = 'height';
+            this._thicknessPropertyName = 'width';
+            this._leftPropertyName = 'top';
+            this._topPropertyName = 'left'
         }
-        else{
-            
+        else {
+            this._widthPropertyName = 'width';
+            this._thicknessPropertyName = 'height';
+            this._leftPropertyName = 'left';
+            this._topPropertyName = 'top';
         }
     }
 }
@@ -39,7 +45,7 @@ class HandleView {
         else {
             this._handleObject.css("left", -thickness / 2);
         }
-    } 
+    }
     get handleObject(){
         return this._handleObject;
     }
@@ -79,7 +85,7 @@ class HandleView {
         else{
             offsetModifier["left"] = offset;
         }
-        
+
         this._handleObject.offset(offsetModifier);
     }
 
@@ -94,6 +100,7 @@ class HandleView {
 }
 
 class IndicatorView {
+    private _oriented: OrientedPropertyNames;
     private _indicatorObject: object;
     private _indicatorWidth: number;
     private _indicatorHeight: number;
@@ -103,14 +110,13 @@ class IndicatorView {
         this._indicatorObject = indicatorObject;
         this._indicatorWidth = this._indicatorObject.outerWidth();
         this._indicatorHeight = this._indicatorObject.outerHeight();
+
+        this._oriented = new OrientedPropertyNames(options.vertical);
         this._vertical = options.vertical;
-        
-        // корректируем положение индикатора относительно центра рукоятки 
-        if(!this._vertical){
-            this._indicatorObject.css('left', (- this._indicatorWidth / 2));
-        }
-        else{
-            this._indicatorObject.css('top', (- this._indicatorHeight / 2));
+
+        // корректируем положение индикатора относительно центра рукоятки
+        this._indicatorObject.css(this._oriented._leftPropertyName, (- this._indicatorWidth / 2));
+        if(this._vertical){
             this._indicatorObject.css('left', '-55px');
         }
     }
@@ -118,14 +124,7 @@ class IndicatorView {
     // перемещаем индикатор
     show(offset: number, text: number) {
         let modifier = {};
-        let propertyName = '';
-        if(this._vertical){
-            propertyName = 'top';
-        }
-        else{
-            propertyName = 'left';
-        }
-        modifier[propertyName] = offset - this._indicatorWidth / 2;
+        modifier[this._oriented._leftPropertyName] = offset - this._indicatorWidth / 2;
         this._indicatorObject.offset(modifier); //передаем координаты индикатору
         this._indicatorObject.text(text);
     };
@@ -134,7 +133,7 @@ class IndicatorView {
 class ColorRangeView {
     private _colorRangeObject: object;
     private _vertical: boolean;
-    
+
     constructor(colorRangeObject: object, options: object){
         this._colorRangeObject = colorRangeObject;
         this._vertical = options.vertical;
@@ -151,7 +150,6 @@ class ColorRangeView {
         if (fromOffset > toOffset){
             [fromOffset, toOffset] = [toOffset, fromOffset];
         }
-        console.log("from " + fromOffset + " to " + toOffset);       
         let offsetModifier = {};
         let widthPropertyName = '';
         if(this._vertical){
@@ -159,11 +157,11 @@ class ColorRangeView {
             widthPropertyName = 'height';
         }
         else {
-            offsetModifier['left'] = fromOffset 
+            offsetModifier['left'] = fromOffset
             widthPropertyName = 'width';
         }
         this._colorRangeObject.offset(offsetModifier);
-        
+
         let width = toOffset - fromOffset;
         this._colorRangeObject.css(widthPropertyName, width);
     }
@@ -184,7 +182,7 @@ class ScaleView {
         for(let i = 0; i < options.scaleDivision; i++){
             this._scaleObject.append("<span><i class='scale-number'></i></span>");
         }
-        
+
         let arrSpan = this._scaleObject.children('span');
         if(!options.vertical){
             arrSpan.css({'border-left': '1px solid grey', 'height' : '8px'});
@@ -204,7 +202,7 @@ class ScaleView {
             else{
                 arrSpan.eq(i).css('left', count);
             }
-        }  
+        }
 
         let arrNumberScale = this._scaleObject.find('.scale-number');
         if(!options.vertical){
@@ -223,7 +221,7 @@ class ScaleView {
             else{
                 arrNumberScale.eq(i).text(scaleValue);
             }
-        }                
+        }
     }
 
     setStep(stepValue: number) {
@@ -236,6 +234,7 @@ class ScaleView {
 }
 
 export class View {
+    private _oriented: OrientedPropertyNames;
     private _minHandle: HandleView;
     private _maxHandle: HandleView;
     private _indicator: IndicatorView;
@@ -274,6 +273,8 @@ export class View {
     }
     private initialize(options, $this) {
 
+        this._oriented = new OrientedPropertyNames(options.vertical);
+
         let content = "<div class='slider-range-content'>" +
                                 "<div class='slider-color-range'></div>" +
                                 "<span class='slider-range-handle'></span>" +
@@ -284,15 +285,18 @@ export class View {
 
         // параметры слайдера
         let slider = $this.find(".slider-range-content");
-    
-        if(!options.vertical){
-            slider.css("height", options.thickness);
-            slider.css("width", options.expansion);
-        }
-        else{
-            slider.css("width", options.thickness);
-            slider.css("height", options.expansion);
-        }
+
+        // if(!options.vertical){
+        //     slider.css("width", options.expansion);
+        //     slider.css("height", options.thickness);
+        // }
+        // else{
+        //     slider.css("width", options.thickness);
+        //     slider.css("height", options.expansion);
+        // }
+
+        slider.css(this._oriented._widthPropertyName, options.expansion);
+        slider.css(this._oriented._thicknessPropertyName, options.thickness)
 
         // зная все размеры, можно уточнить границы слайдера
         let minOffset;
@@ -328,8 +332,8 @@ export class View {
         if (!options.isDouble) {
             this._maxHandle.setOffsetFromValue(options.min);
             this._minHandle.hide();
-        }  
-        
+        }
+
         // закраска слайдера
         let colorRangeObject = $this.find('.slider-color-range');
         this._colorRange = new ColorRangeView(colorRangeObject, options);
@@ -340,7 +344,6 @@ export class View {
             slider.append(indicatorContent);
         }
         let indicatorObject = $this.find('.indicator');
-        console.log(indicatorObject);
         this._indicator = new IndicatorView(indicatorObject, options);
         this._indicator.show(this._maxHandle.getOffset(), options.max);
 
@@ -357,10 +360,5 @@ export class View {
         handle.setOffsetFromValue(value.getValue());
         this._colorRange.doColor(this._minHandle.getOffset(), this._maxHandle.getOffset());
         this._indicator.show(handle.getOffset(), value.getValue());
-
-        // convert value to offset
-        // .css
-        // indicator
-        
     }
 }
