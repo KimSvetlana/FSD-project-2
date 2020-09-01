@@ -10,8 +10,9 @@ export class Controller {
 
   private _minBounds;
   private _maxBounds;
+  private _slider;
 
-  constructor(model: SliderModel, handleMinObject, handleMaxObject, options, minBounds, maxBounds) {
+  constructor(model: SliderModel, handleMinObject, handleMaxObject, options, minBounds, maxBounds, slider) {
     this._model = model;
     this._options = options;
     this._handleMinObject = handleMinObject;
@@ -19,6 +20,7 @@ export class Controller {
 
     this._minBounds = minBounds;
     this._maxBounds = maxBounds;
+    this._slider = slider;
 
     let self = this;
     let sliderHandles = self._model.getSliderHandles();
@@ -27,12 +29,19 @@ export class Controller {
     minHandle.setValue(options.min);
     maxHandle.setValue(options.max);
 
+    // для обработчика по клику присваиваем activeHandle
+    this._activeHandle = maxHandle;
+
     this._handleMinObject.on("mousedown", function (mouseEvent) {
       self._onHandleMouseDown(sliderHandles[0]);
     });
 
     this._handleMaxObject.on("mousedown", function (mouseEvent) {
       self._onHandleMouseDown(sliderHandles[1]);
+    });
+
+    this._slider.on('click', function(movePosition){      
+      self._onMouseMove(movePosition);
     });
   }
 
@@ -47,6 +56,13 @@ export class Controller {
       $(document).off('mousemove');
     })
   }
+
+  // _onSliderClick(){
+  //   let self = this;
+  //   this._slider.on('click', function(movePosition){
+  //     self._onMouseMove(movePosition);
+  //   });
+  // }
 
   _onMouseMove(movePosition) {
     let movePos;

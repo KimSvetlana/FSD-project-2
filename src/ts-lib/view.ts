@@ -193,6 +193,8 @@ class ScaleView {
         this._oriented = new OrientedPropertyNames(options.vertical);
 
         this._scaleObject.css(this._oriented.topPropertyName, options.thickness * 1.5 );
+        this._scaleObject.css(this._oriented.widthPropertyName, 'inherit');
+        this._scaleObject.css(this._oriented.heightPropertyName, 0);
 
         for(let i = 0; i < options.scaleDivision; i++){
             this._scaleObject.append("<span><i class='scale-number'></i></span>");
@@ -227,10 +229,10 @@ class ScaleView {
         let stepScale = (options.max - options.min) / (options.scaleDivision -1);
         let scaleValue = 0;
 
-        for(let i = 0; i < arrNumberScale.length; i++){
+        for(let i = 0, j = arrNumberScale.length -1; i < arrNumberScale.length, j >= 0; i++, j--){
             scaleValue = options.min + stepScale * i;
             if(options.vertical){
-                arrNumberScale.eq(i).text(-scaleValue);
+                arrNumberScale.eq(j).text(scaleValue);
             }
             else{
                 arrNumberScale.eq(i).text(scaleValue);
@@ -257,6 +259,7 @@ export class View {
 
     private _minBounds: number;
     private _maxBounds: number;
+    private _slider: object;
     constructor(model: SliderModel, options, $this){
 
         this.initialize(options, $this);
@@ -285,6 +288,10 @@ export class View {
     get maxBounds(){
         return this._maxBounds;
     }
+
+    get slider(){
+        return this._slider;
+    }
     private initialize(options, $this) {
 
         this._oriented = new OrientedPropertyNames(options.vertical);
@@ -299,6 +306,7 @@ export class View {
 
         // параметры слайдера
         let slider = $this.find(".slider-range-content");
+        this._slider = slider;
 
         slider.css(this._oriented.widthPropertyName, options.expansion);
         slider.css(this._oriented.heightPropertyName, options.thickness)

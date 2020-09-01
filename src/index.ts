@@ -27,7 +27,7 @@ import {Controller} from './ts-lib/controller'
             let $this = $(this);
             let model = new SliderModel(options);
             let view = new View(model, options, $this);
-            let controller = new Controller(model, view.minHandle.handleObject, view.maxHandle.handleObject, options, view.minBounds, view.maxBounds);
+            let controller = new Controller(model, view.minHandle.handleObject, view.maxHandle.handleObject, options, view.minBounds, view.maxBounds, view.slider);
         };
     return this.each(makeSliderFunction);
 };

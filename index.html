@@ -10,6 +10,7 @@
         }
         .slider-range-container{
             width: 450px;
+            height: 35px;
             margin-top: 50px;
             margin-left: 30px;
         }
@@ -18,14 +19,16 @@
         }
         .slider-range{
             width: 450px;
+            height: 35px;
             margin-top: 50px;
             margin-left: 30px;
         }
         .vertical-slider{
             margin-top: 30px;
             margin-left: 60px;
-            width: 150px;
-            height: 450px;
+            width: 70px;
+            height: 350px;
+            margin-bottom: 30px;
         }
     </style>
    
@@ -69,11 +72,13 @@
         
         $('.vertical-slider').mySliderPlugin({ 
             isDouble: true, 
-            vertical: true, 
+            vertical: true,
+            min: -10000,
+            max: 20000,
+            step: 99,
             thickness: 15, 
             indicatorVisibility: true,
             scaleOfValues: true,
-            expansion: 200
         });
     </script>
 
