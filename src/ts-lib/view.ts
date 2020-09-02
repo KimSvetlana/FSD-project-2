@@ -1,63 +1,147 @@
 import {IHasValue, SliderModel} from './model';
 
-class OrientedPropertyNames{
-    private _widthPropertyName: string;
-    private _heightPropertyName: string;
-    private _leftPropertyName: string;
-    private _topPropertyName: string;
+interface IOrientedElement {
+    width : number;
+    height : number;
+    left : number;
+    top : number;
+    offsetLeft : number;
+}
 
-    constructor(vertical: boolean) {
-        if (vertical) {
-            this._widthPropertyName = 'height';
-            this._heightPropertyName = 'width';
-            this._leftPropertyName = 'top';
-            this._topPropertyName = 'left'
-        }
-        else {
-            this._widthPropertyName = 'width';
-            this._heightPropertyName = 'height';
-            this._leftPropertyName = 'left';
-            this._topPropertyName = 'top';
-        }
+class OrientedElementBase {
+    protected _element : JQuery;
+
+    constructor(element: JQuery){
+        this._element = element;
     }
 
-    public get widthPropertyName(){
-        return this._widthPropertyName;
+    protected _setProperty(propertyName: string, value : number) : void {
+        this._element.css(propertyName, value);
     }
 
-    public get heightPropertyName() {
-        return this._heightPropertyName;
+    protected _getProperty(propertyName: string) : number {
+        return Number.parseFloat(this._element.css(propertyName));
+    }
+}
+
+class HorizontalElement extends OrientedElementBase implements IOrientedElement {
+
+    constructor(element: JQuery) {
+        super(element);
     }
 
-    public get leftPropertyName() {
-        return this._leftPropertyName;
+    public get width() : number {
+        return this._getProperty("width");
     }
 
-    public  get topPropertyName() {
-        return this._topPropertyName;
+    public set width(value: number) : void {
+        this._setProperty("width", value);
+    }
+
+    public get height() : number {
+        return this._getProperty("height");
+    }
+
+    public set height(value: number) : void {
+        this._setProperty("height", value);
+    }
+
+    public get left() : number {
+        return this._getProperty("left");
+    }
+
+    public set left(value: number) : void {
+        this._setProperty("left", value);
+    }
+
+    public get offsetLeft() : number {
+        return this._element.offset().left;
+    }
+
+    public set offsetLeft(value: number) : void {
+        this._element.offset({left: value});
+    }
+
+    public get top() : number {
+        return this._getProperty("top");
+    }
+
+    public set top(value: number) : void {
+        this._setProperty("top", value);
+    }
+}
+
+class VerticalElement extends OrientedElementBase implements IOrientedElement {
+
+    constructor(element: JQuery) {
+        super(element);
+    }
+
+    public get width() : number {
+        return this._getProperty("height");
+    }
+
+    public set width(value: number) : void {
+        this._setProperty("height", value);
+    }
+
+    public get height() : number {
+        return this._getProperty("width");
+    }
+
+    public set height(value: number) : void {
+        this._setProperty("width", value);
+    }
+
+    public get left() : number {
+        return this._getProperty("top");
+    }
+
+    public set left(value: number) : void {
+        this._setProperty("top", value);
+    }
+
+    public get offsetLeft() : number {
+        return this._element.offset().top;
+    }
+
+    public set offsetLeft(value: number) : void {
+        this._element.offset({top: value});
+    }
+
+    public get top() : number {
+        return this._getProperty("left");
+    }
+
+    public set top(value: number) : void {
+        this._setProperty("left", value);
     }
 }
 
 class HandleView {
-    private _handleObject: object;
-    private _vertical: boolean;
+    private _handleObject: JQuery;
     private _minOffset: number;
     private _maxOffset: number;
     private _maxValue: number;
     private _minValue: number;
     private _handleWidth: number;
-    private _oriented: OrientedPropertyNames;
+    private _oriented: IOrientedElement;
 
-    constructor(handleObject: object, vertical: boolean, thickness : number){
+    constructor(handleObject: JQuery, vertical: boolean, thickness : number){
         this._handleObject = handleObject;
         this._handleWidth = thickness * 2;
-        this._vertical = vertical;
-        this._oriented = new OrientedPropertyNames(vertical);
+
+        if (vertical){
+            this._oriented = new VerticalElement(handleObject);
+        }
+        else {
+            this._oriented = new HorizontalElement(handleObject);
+        }
 
         // параметры и расположение бегунка
         this._handleObject.css({ 'width': this._handleWidth, 'height': this._handleWidth });
         // выравнивание бегунка относительно кулисы
-        this._handleObject.css(this._oriented.topPropertyName, -thickness / 2);
+        this._oriented.top = -thickness / 2;
     }
     get handleObject(){
         return this._handleObject;
@@ -90,35 +174,31 @@ class HandleView {
 
         // корректировка относительно центра бегунка
         offset -= this._handleWidth / 2;
-        let offsetModifier = {};
-        offsetModifier[this._oriented.leftPropertyName] = offset;
-        this._handleObject.offset(offsetModifier);
+        this._oriented.offsetLeft = offset;
     }
 
     getOffset(): number {
-        if (this._vertical){
-            return this._handleObject.offset().top + this._handleWidth / 2;
-        }
-        else {
-            return this._handleObject.offset().left + this._handleWidth / 2;
-        }
+        return this._oriented.offsetLeft + this._handleWidth / 2;
     }
 }
 
 class IndicatorView {
-    private _oriented: OrientedPropertyNames;
-    private _indicatorObject: object;
-    private _indicatorWidth: number;
-    private _indicatorHeight: number;
+    private _oriented: IOrientedElement;;
+    private _indicatorObject: JQuery;
+
     private _options: object;
 
-    constructor(indicatorObject: Object, options: Object){
+    constructor(indicatorObject: JQuery, options: Object){
         this._indicatorObject = indicatorObject;
         this._options = options;
-        this._indicatorWidth = this._indicatorObject.outerWidth();
-        this._indicatorHeight = this._indicatorObject.outerHeight();
 
-        this._oriented = new OrientedPropertyNames(options.vertical);
+        if (options.vertical){
+            // VerticalElement
+            this._oriented = new VerticalElement(indicatorObject);
+        }
+        else {
+            this._oriented = new HorizontalElement(indicatorObject);
+        }
     }
 
     private getOrientedHeight() {
@@ -128,7 +208,6 @@ class IndicatorView {
         else {
             return this._indicatorObject.outerHeight();
         }
-        //return Number.parseInt(this._indicatorObject.css(this._oriented.heightPropertyName));
     }
 
     private getOrientedWidth() {
@@ -138,7 +217,6 @@ class IndicatorView {
         else {
             return this._indicatorObject.outerWidth();
         }
-        //return Number.parseInt(this._indicatorObject.css(this._oriented.widthPropertyName));
     }
 
     // перемещаем индикатор
@@ -150,51 +228,58 @@ class IndicatorView {
         let correction = - this.getOrientedWidth() / 2;
 
          // отступ от консоли
-         let margin = - (this.getOrientedHeight() + this._options.thickness);
-         this._indicatorObject.css(this._oriented.topPropertyName, margin);
-
-        let modifier = {};
-        modifier[this._oriented.leftPropertyName] = offset + correction;
-        this._indicatorObject.offset(modifier); //передаем координаты индикатору
+        let margin = - (this.getOrientedHeight() + this._options.thickness);
+        this._oriented.top = margin;
+        this._oriented.offsetLeft = (offset + correction); //передаем координаты индикатору
     };
 }
 
 class ColorRangeView {
-    private _oriented: OrientedPropertyNames;
-    private _colorRangeObject: object;
+    private _oriented: IOrientedElement
+    private _colorRangeObject: JQuery;
 
-    constructor(colorRangeObject: object, options: object){
+    constructor(colorRangeObject: JQuery, options: object){
         this._colorRangeObject = colorRangeObject;
-        this._oriented = new OrientedPropertyNames(options.vertical);
+
+        if (options.vertical){
+            this._oriented = new VerticalElement(colorRangeObject);
+        }
+        else {
+            this._oriented = new HorizontalElement(colorRangeObject);
+        }
 
         colorRangeObject.css('background-color', options.backgroundColor);
-        colorRangeObject.css(this._oriented.heightPropertyName, options.thickness);
+        this._oriented.height = options.thickness;
     }
 
     doColor(fromOffset: number, toOffset: number) {
         if (fromOffset > toOffset){
             [fromOffset, toOffset] = [toOffset, fromOffset];
         }
-        let offsetModifier = {};
-        offsetModifier[this._oriented.leftPropertyName] = fromOffset;
-        this._colorRangeObject.offset(offsetModifier);
+        this._oriented.offsetLeft = fromOffset;
 
         let width = toOffset - fromOffset;
-        this._colorRangeObject.css(this._oriented.widthPropertyName, width);
+        this._oriented.width = width;
     }
 }
 
 class ScaleView {
-    private _oriented: OrientedPropertyNames;
-    private _scaleObject: object;
+    private _oriented: IOrientedElement;
+    private _scaleObject: JQuery;
 
-    constructor(sliderObject, options){
+    constructor(sliderObject : JQuery, options: object){
         this._scaleObject = sliderObject;
-        this._oriented = new OrientedPropertyNames(options.vertical);
 
-        this._scaleObject.css(this._oriented.topPropertyName, options.thickness * 1.5 );
-        this._scaleObject.css(this._oriented.widthPropertyName, 'inherit');
-        this._scaleObject.css(this._oriented.heightPropertyName, 0);
+        if (options.vertical){
+            this._oriented = new VerticalElement(sliderObject);
+        }
+        else {
+            this._oriented = new HorizontalElement(sliderObject);
+        }
+
+        this._oriented.top = options.thickness * 1.5;
+        this._oriented.width = 'inherit';
+        this._oriented.height = 0;
 
         for(let i = 0; i < options.scaleDivision; i++){
             this._scaleObject.append("<span><i class='scale-number'></i></span>");
@@ -214,7 +299,12 @@ class ScaleView {
 
         for(let i = 0; i < arrSpan.length; i++){
             count = `${indicatorLeft * i}%`;
-            arrSpan.eq(i).css(this._oriented.leftPropertyName, count);
+            if(options.vertical){
+                arrSpan.eq(i).css('top', count);
+            }
+            else{
+                arrSpan.eq(i).css('left', count);
+            }
         }
 
         let arrNumberScale = this._scaleObject.find('.scale-number');
@@ -250,7 +340,7 @@ class ScaleView {
 }
 
 export class View {
-    private _oriented: OrientedPropertyNames;
+    private _oriented: IOrientedElement;
     private _minHandle: HandleView;
     private _maxHandle: HandleView;
     private _indicator: IndicatorView;
@@ -260,7 +350,7 @@ export class View {
     private _minBounds: number;
     private _maxBounds: number;
     private _slider: object;
-    constructor(model: SliderModel, options, $this){
+    constructor(model: SliderModel, options:object, $this){
 
         this.initialize(options, $this);
 
@@ -292,24 +382,31 @@ export class View {
     get slider(){
         return this._slider;
     }
-    private initialize(options, $this) {
+    private initialize(options: object, $this) {
 
-        this._oriented = new OrientedPropertyNames(options.vertical);
+        // this._oriented = new OrientedPropertyNames(options.vertical);
 
         let content = "<div class='slider-range-content'>" +
-                                "<div class='slider-color-range'></div>" +
-                                "<span class='slider-range-handle'></span>" +
-                                "<span class='slider-range-handle' ></span>"+
-                            "</div>"
+        "<div class='slider-color-range'></div>" +
+        "<span class='slider-range-handle'></span>" +
+        "<span class='slider-range-handle' ></span>"+
+        "</div>"
 
         $this.append(content);
 
         // параметры слайдера
         let slider = $this.find(".slider-range-content");
         this._slider = slider;
+        
+        if (options.vertical){
+            this._oriented = new VerticalElement(slider);
+        }
+        else {
+            this._oriented = new HorizontalElement(slider);
+        }
 
-        slider.css(this._oriented.widthPropertyName, options.expansion);
-        slider.css(this._oriented.heightPropertyName, options.thickness)
+        this._oriented.width = options.expansion;
+        this._oriented.height = options.thickness;
 
         // зная все размеры, можно уточнить границы слайдера
         let minOffset;
