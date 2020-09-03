@@ -32,6 +32,7 @@ export class Controller {
     // для обработчика по клику присваиваем activeHandle
     this._activeHandle = maxHandle;
 
+
     this._handleMinObject.on("mousedown", function (mouseEvent) {
       self._onHandleMouseDown(sliderHandles[0]);
     });

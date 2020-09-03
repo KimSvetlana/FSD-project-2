@@ -5,6 +5,7 @@ import './scss/style.scss';
 import {SliderModel} from'./ts-lib/model'
 import { View } from './ts-lib/view';
 import {Controller} from './ts-lib/controller'
+
 (function ($) {
     $.fn.mySliderPlugin = function (options) {
         // настройки по умолчанию
@@ -27,7 +28,14 @@ import {Controller} from './ts-lib/controller'
             let $this = $(this);
             let model = new SliderModel(options);
             let view = new View(model, options, $this);
-            let controller = new Controller(model, view.minHandle.handleObject, view.maxHandle.handleObject, options, view.minBounds, view.maxBounds, view.slider);
+            let controller = new Controller(
+                model, 
+                view.minHandle.handleObject, 
+                view.maxHandle.handleObject, 
+                options, 
+                view.sliderBar.getMinOffset(), 
+                view.sliderBar.getMaxOffset(), 
+                view.sliderBar.element);
         };
     return this.each(makeSliderFunction);
 };

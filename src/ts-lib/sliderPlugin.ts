@@ -161,7 +161,6 @@ global.jQuery = global.$ = $;
                     return this.valueToPos(value);
                 },
                 getPosition: function () {
-                    // console.log("handleMin offset = " + this.jqueryObject.offset()[_leftPropertyName]);
                     return this.jqueryObject.offset()[_leftPropertyName] + _handleWidth / 2;
                 },
 
@@ -172,7 +171,6 @@ global.jQuery = global.$ = $;
                 setPositionWithoutCorrection: function (pos) {
                     let offsetModifier = {};
                     offsetModifier[_leftPropertyName] = pos - _handleWidth / 2;
-                    // console.log("handleMin set offset = " + offsetModifier[_leftPropertyName]);
                     return this.jqueryObject.offset(offsetModifier)
                 },
 
@@ -181,13 +179,11 @@ global.jQuery = global.$ = $;
                 },
 
                 setPosition: function (pos) {
-                    //console.log("pos before correction: " + pos);
                     pos = this.getClosestStepPos(pos);
 
                     // Коррекция на доступную область перемещения
                     pos = this.clamp(pos);
 
-                    //console.log("pos after correction: " + pos);
 
                     this.setPositionWithoutCorrection(pos);
                 },
@@ -231,7 +227,6 @@ global.jQuery = global.$ = $;
 
             let activeHandle = handleMax;
 
-            // console.log("sliderMinPos = " + _sliderMinPos);
             // Начальное положение бегунков
             handleMin.setInitialPosition(_sliderMinPos);
             handleMax.setInitialPosition(_sliderMaxPos);
