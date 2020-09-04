@@ -3,16 +3,23 @@ import{View} from './view'
 
 export class Controller {
   private _model: SliderModel;
-  private _options: any;
+  private _options: object;
   private _activeHandle: HandleModel;
-  private _handleMinObject: object;
-  private _handleMaxObject: object;
+  private _handleMinObject: JQuery;
+  private _handleMaxObject: JQuery;
 
-  private _minBounds;
-  private _maxBounds;
-  private _slider;
+  private _minBounds: number;
+  private _maxBounds: number;
+  private _slider: JQuery;
 
-  constructor(model: SliderModel, handleMinObject, handleMaxObject, options, minBounds, maxBounds, slider) {
+  constructor(
+    model: SliderModel,
+    handleMinObject: JQuery,
+    handleMaxObject: JQuery,
+    options: Object,
+    minBounds: number,
+    maxBounds: number,
+    slider: JQuery) {
     this._model = model;
     this._options = options;
     this._handleMinObject = handleMinObject;
@@ -57,13 +64,6 @@ export class Controller {
       $(document).off('mousemove');
     })
   }
-
-  // _onSliderClick(){
-  //   let self = this;
-  //   this._slider.on('click', function(movePosition){
-  //     self._onMouseMove(movePosition);
-  //   });
-  // }
 
   _onMouseMove(movePosition) {
     let movePos;

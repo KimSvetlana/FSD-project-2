@@ -394,10 +394,10 @@ export class View {
     private initialize(options: object, $this) {
 
         let content = "<div class='slider-range-content'>" +
-        "<div class='slider-color-range'></div>" +
-        "<span class='slider-range-handle'></span>" +
-        "<span class='slider-range-handle' ></span>"+
-        "</div>"
+                        "<div class='slider-color-range'></div>" +
+                        "<span class='slider-range-handle'></span>" +
+                        "<span class='slider-range-handle' ></span>"+
+                    "</div>"
 
         $this.append(content);
 
@@ -408,8 +408,6 @@ export class View {
         // зная все размеры, можно уточнить границы слайдера
         let minOffset = this._sliderBar.getMinOffset();
         let maxOffset = this._sliderBar.getMaxOffset();
-        console.log("min " + minOffset + " max " + maxOffset);
-
 
         let handles = $this.find('.slider-range-handle');
 
