@@ -284,7 +284,7 @@ class ScaleView extends OrientedView {
         this._oriented.width = 'inherit';
         this._oriented.height = 0;
 
-        for(let i = 0; i < options.scaleDivision; i++){
+        for(let i = 0; i < options.scaleDivision + 1; i++){
             this._scaleObject.append("<span><i class='scale-number'></i></span>");
         }
 
@@ -319,7 +319,7 @@ class ScaleView extends OrientedView {
             arrNumberScale.css({'left': '10px', 'top':'-5px'});
         };
 
-        let stepScale = (options.max - options.min) / (options.scaleDivision -1);
+        let stepScale = (options.max - options.min) / (options.scaleDivision);
         let scaleValue = 0;
 
         for(let i = 0, j = arrNumberScale.length -1; i < arrNumberScale.length, j >= 0; i++, j--){
