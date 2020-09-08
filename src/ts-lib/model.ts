@@ -40,8 +40,12 @@ export class HandleModel implements IHasValue {
     return this._slideEvent.asEvent();
   }
 
-  setStep(step) {
-    this._step = step;
+  public set step(value: number) {
+    this._step = value;
+  }
+
+  public get step() {
+    return this._step;
   }
 
   setBounds(leftBound: IHasValue, rightBound: IHasValue) {
@@ -75,42 +79,56 @@ export class SliderModel {
   private _activeHandle: HandleModel;
   private _minValue: number;
   private _maxValue: number;
-  private _step: number;
   private _isDouble: boolean;
   private _slideEvent = new SimpleEventDispatcher<ISlideEvent>();
-
+  
   constructor(options) {
     this._minValue = options.min;
     this._maxValue = options.max;
-    this._step = options.step;
     
     this._minHandle = new HandleModel(options.min);
     this._maxHandle = new HandleModel(options.max);
+    this.setMinBound(options.min);
+    this.setMaxBound(options.max);
+    this.step = options.step;
+  }
+
+  public set step(value: number) {
+    this._minHandle.step = value;
+    this._maxHandle.step = value;
+  }
+
+  public get step() {
+    return this._maxHandle.step;
+  }
+
+  setMinBound(value) {
+    this._minValue = value;
     this._minHandle.setBounds(new StaticValue(this._minValue), this._maxHandle);
+
+  }
+
+  setMaxBound(value) {
+    this._minValue = value;
     this._maxHandle.setBounds(this._minHandle, new StaticValue(this._maxValue));
-    this._minHandle.setStep(this._step);
-    this._maxHandle.setStep(this._step);
   }
 
   getSliderHandles() {
     return [this._minHandle, this._maxHandle];
   }
 
-  public get sliderValue() : number {
-    return this._activeHandle.getValue();
-  }
-  
-  public set sliderValue(value: number) {
-    this._activeHandle.setValue(value);
-    this._slideEvent.dispatch(new ISlideEvent(this._minHandle, this._maxHandle));
-  }
-
   public get slideEvent() {
     return this._slideEvent.asEvent();
   }
 
-  setSliderValues(){
-    
+  getSliderValue(){
+    return this._maxHandle.getValue();
   }
+
+  setSliderValue(value: number){
+    this._maxHandle.setValue(value)
+  }
+
+
  
 };

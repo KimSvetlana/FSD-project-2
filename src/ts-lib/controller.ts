@@ -77,5 +77,5 @@ export class Controller {
     let proportion = (movePos - this._minBounds) / (this._maxBounds - this._minBounds);
     let value = this._options.min + proportion * (this._options.max - this._options.min);
     this._activeHandle.setValue(value);
-  } 
+  }
 }  

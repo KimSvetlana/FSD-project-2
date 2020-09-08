@@ -457,4 +457,16 @@ export class View {
         this._colorRange.doColor(this._minHandle.getOffset(), this._maxHandle.getOffset());
         this._indicator.show(handle.getOffset(), value.getValue());
     }
+
+    // методы
+    // public get indicatorVisibility(){}
+
+    public set indicatorVisibility(value){
+        if(value === false){
+            this._indicator.hide();
+        }
+        else{
+            this._indicator.show();
+        }
+    }
 }
