@@ -48,8 +48,8 @@ export class SliderPlugin {
         }
     }
 
-    setSliderValue(val: number){
-        return this._model.setSliderValue(val);
+    setSliderValue(val1: number, val2: number){
+        return this._model.setSliderValue(val1, val2);
     }       
     
     getSliderValue(){   

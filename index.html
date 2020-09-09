@@ -65,21 +65,23 @@
             });
         });
 
-        // $('.slider-range-container').mySliderPlugin('destroy');
-
         $('.stepCounter').change(function(){
             let stepCount = $('.stepCounter').val();
             $('.slider-range-container').mySliderPlugin('option', 'step', stepCount);
 
-            let min = -150;
-            $('.slider-range-container').mySliderPlugin('option', 'min', min );
-    
+            
         });
-
+        
+        let min = -150;
+        $('.slider-range-container').mySliderPlugin('option', 'min', min );
         
         let value = $('.slider-range-container').mySliderPlugin('value');
         console.log("value = " + value);
         $('.slider-value').text(value);
+
+        let newValue = 0;
+        $('.slider-range-container').mySliderPlugin('value', newValue);
+
         
         
         $('.slider-range').mySliderPlugin({
@@ -90,6 +92,8 @@
                 slider.next().find('.slider-value').text('от ' + sliderState.values[0] + ' до ' + sliderState.values[1])
             }
         });
+        $('.slider-range').mySliderPlugin('values', [50, -50]);
+
         
         $('.vertical-slider').mySliderPlugin({ 
             isDouble: true, 

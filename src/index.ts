@@ -39,9 +39,6 @@ import {SliderPlugin} from './ts-lib/sliderPlugin'
         //     return plugin.destroy;
         // },
 
-        // values
-
-
         option : function(name:string, value:any) {
             if (arguments.length) {
                 return this.each(function() {
@@ -68,9 +65,28 @@ import {SliderPlugin} from './ts-lib/sliderPlugin'
             else {    
                 let $this = this.first();
                 let plugin = $this.data(pluginName) as SliderPlugin;       
+                let values = plugin.getSliderValue();
+                return values[1];
+            }
+        },
+
+        values: function (val: any) {
+            if (arguments.length) {
+                return this.each(function () {
+                    let maxValue = Math.max.apply(null, val);
+                    let minValue = Math.min.apply(null, val);
+                    let $this = $(this);
+                    let plugin = $this.data(pluginName) as SliderPlugin;
+                    plugin.setSliderValue( maxValue, minValue);
+                });
+            }
+            else {
+                let $this = this.first();
+                let plugin = $this.data(pluginName) as SliderPlugin;
                 return plugin.getSliderValue();
             }
         }
+                
     };
 
     $.fn.mySliderPlugin = function (method){

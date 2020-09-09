@@ -461,7 +461,7 @@ export class View {
     // методы
     // public get indicatorVisibility(){}
 
-    public set indicatorVisibility(value){
+    public set indicatorVisibility(value:boolean){
         if(value === false){
             this._indicator.hide();
         }
