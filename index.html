@@ -64,8 +64,8 @@
                 min: -50,
                 max: 50,
                 step: 2,
-                slideHandler: function (sliderState) {
-                    $this.next().find('.slider-value').text(`${sliderState.value}`)
+                slideHandler: function (slideEvent) {
+                    $this.next().find('.slider-value').text(slideEvent.value)
                 }
             });
         });
@@ -98,15 +98,15 @@
         // $('.slider-range-container').mySliderPlugin('option', 'min', min );
         // $('.slider-range-container').mySliderPlugin('destroy');
         
-        $('.slider-range').mySliderPlugin({
+        let sliderRange = $('.slider-range');
+        sliderRange.mySliderPlugin({
             isDouble: true,
             indicatorVisibility: true,
             slideHandler: function (sliderState) {
-                let slider = $(sliderState.self);
-                slider.next().find('.slider-value').text('от ' + sliderState.values[0] + ' до ' + sliderState.values[1])
+                sliderRange.next().find('.slider-value').text('от ' + sliderState.values[0] + ' до ' + sliderState.values[1])
             }
         });
-        $('.slider-range').mySliderPlugin('values', [-30, 70]);
+        sliderRange.mySliderPlugin('values', [-30, 70]);
 
         
         $('.vertical-slider').mySliderPlugin({ 

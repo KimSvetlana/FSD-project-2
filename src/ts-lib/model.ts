@@ -15,13 +15,13 @@ class StaticValue implements IHasValue {
   }
 };
 
-export class ISlideEvent {
-  minHandle: IHasValue;
-  maxHandle: IHasValue;
+export class SlideEvent {
+  values: number[];
+  value: number;
 
-  constructor(minHandle: IHasValue, maxHandle: IHasValue) {
-    this.minHandle = minHandle;
-    this.maxHandle =maxHandle;
+  constructor(values: number[], value: number) {
+    this.values = values;
+    this.value = value;
   }
 }
 
@@ -80,7 +80,7 @@ export class SliderModel {
   private _minValue: number;
   private _maxValue: number;
   private _isDouble: boolean;
-  private _slideEvent = new SimpleEventDispatcher<ISlideEvent>();
+  private _slideEvent = new SimpleEventDispatcher<SlideEvent>();
   
   constructor(options) {
     this._minValue = options.min;
@@ -91,6 +91,12 @@ export class SliderModel {
     this.setMinBound(options.min);
     this.setMaxBound(options.max);
     this.step = options.step;
+    let self = this;
+    for (var handle of [this._minHandle, this._maxHandle]){
+      handle.slideEvent.subscribe((handle: IHasValue) => {
+        self.onHandleSlide(handle);
+      });
+    };
   }
 
   public set step(value: number) {
@@ -105,7 +111,6 @@ export class SliderModel {
   setMinBound(value: number) {
     this._minValue = value;
     this._minHandle.setBounds(new StaticValue(this._minValue), this._maxHandle);
-
   }
 
   setMaxBound(value: number) {
@@ -130,8 +135,15 @@ export class SliderModel {
   getSliderHandles() {
     return [this._minHandle, this._maxHandle];
   }
+
   public get slideEvent() {
     return this._slideEvent.asEvent();
+  }
+
+  onHandleSlide(handle: IHasValue) {
+    this._slideEvent.dispatch(new SlideEvent(
+      [this._minHandle.getValue(), this._maxHandle.getValue()], 
+      handle.getValue()));
   }
   
   

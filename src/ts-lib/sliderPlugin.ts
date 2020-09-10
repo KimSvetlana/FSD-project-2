@@ -23,6 +23,10 @@ export class SliderPlugin {
             this._view.sliderBar.getMinOffset(), 
             this._view.sliderBar.getMaxOffset(), 
             this._view.sliderBar.element);
+        
+        if (options.slideHandler) {
+            this._model.slideEvent.subscribe(options.slideHandler);
+        }
     }
 
     getOption(name: string) {
