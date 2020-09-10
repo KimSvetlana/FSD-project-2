@@ -172,6 +172,11 @@ class OrientedView {
     public get element() : Jquery {
         return this._oriented.element;
     }
+
+    public setVisible(visible: boolean) : void {
+        let value = visible ? "visible" : "hidden";
+        this.element.css("visibility", value);
+    }
 }
 
 class HandleView extends OrientedView {
@@ -196,10 +201,6 @@ class HandleView extends OrientedView {
     get handleObject(){
         return this._handleObject;
     }
-
-    hide(){
-        this._handleObject.css("visibility", 'hidden');
-    };
 
     setBounds(minOffset: number, maxOffset: number) {
         this._minOffset = minOffset;
@@ -242,7 +243,7 @@ class IndicatorView extends OrientedView {
     }
 
     // перемещаем индикатор
-    show(offset: number, text: number) {
+    indicatorMove(offset: number, text: number) {
 
         this._indicatorObject.text(text);
 
@@ -391,6 +392,10 @@ export class View {
         return this._maxHandle;
     }
 
+    public get indicator() : IndicatorView {
+        return this._indicator;
+    }
+
     private initialize(options: object, $this) {
 
         let content = "<div class='slider-range-content'>" +
@@ -427,7 +432,7 @@ export class View {
         // если бегунок один, то скрываем один из бегунков(minHandle)
         if (!options.isDouble) {
             this._maxHandle.setOffsetFromValue(options.min);
-            this._minHandle.hide();
+            this._minHandle.setVisible(false);
         }
 
         // закраска слайдера
@@ -436,12 +441,11 @@ export class View {
 
         // индикатор
         let indicatorContent = "<span class='indicator'>0</span>";
-        if (options.indicatorVisibility) {
-            slider.append(indicatorContent);
-        }
+        slider.append(indicatorContent);
         let indicatorObject = $this.find('.indicator');
         this._indicator = new IndicatorView(indicatorObject, options);
-        this._indicator.show(this._maxHandle.getOffset(), options.max);
+        this._indicator.indicatorMove(this._maxHandle.getOffset(), options.max);
+        this._indicator.setVisible(options.indicatorVisibility);
 
         // шкала значений
         let wrapScale = "<div class='slider-scale-values'></div>"
@@ -455,18 +459,10 @@ export class View {
     private _onSlideEvent(handle: HandleView, value: IHasValue){
         handle.setOffsetFromValue(value.getValue());
         this._colorRange.doColor(this._minHandle.getOffset(), this._maxHandle.getOffset());
-        this._indicator.show(handle.getOffset(), value.getValue());
+        this._indicator.indicatorMove(handle.getOffset(), value.getValue());
     }
 
-    // методы
-    // public get indicatorVisibility(){}
-
-    public set indicatorVisibility(value:boolean){
-        if(value === false){
-            this._indicator.hide();
-        }
-        else{
-            this._indicator.show();
-        }
+    destroy(){
+        this._sliderBar.hide();
     }
 }

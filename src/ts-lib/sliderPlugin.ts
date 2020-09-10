@@ -43,8 +43,11 @@ export class SliderPlugin {
             case 'min': 
                 return this._model.setMinBound(value);
             
+            case 'max': 
+                return this._model.setMaxBound(value);
+            
             case 'indicatorVisibility':
-                return this._view.indicatorVisibility = value;
+                return this._view.indicator.setVisible(value);
         }
     }
 
@@ -56,8 +59,8 @@ export class SliderPlugin {
         return this._model.getSliderValue();        
     }
 
-    // destroy(){
-    //     return;
-    // }
+    destroy(){
+        return this._view.destroy();
+    }
 
 }

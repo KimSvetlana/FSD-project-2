@@ -33,11 +33,11 @@ import {SliderPlugin} from './ts-lib/sliderPlugin'
             return this.each(makeSliderFunction);
         },
 
-        // destroy : function() {
-        //     let $this = $(this);
-        //     let plugin = $this.data(pluginName) as SliderPlugin;
-        //     return plugin.destroy;
-        // },
+        destroy : function() {
+            let $this = $(this);
+            let plugin = $this.data(pluginName) as SliderPlugin;
+            return plugin.destroy();
+        },
 
         option : function(name:string, value:any) {
             if (arguments.length) {

@@ -113,18 +113,10 @@ export class SliderModel {
     this._maxHandle.setBounds(this._minHandle, new StaticValue(this._maxValue));
   }
 
-  getSliderHandles() {
-    return [this._minHandle, this._maxHandle];
-  }
-
-  public get slideEvent() {
-    return this._slideEvent.asEvent();
-  }
-
   getSliderValue(){
     return [this._minHandle.getValue(),this._maxHandle.getValue()];
   }
-
+  
   setSliderValue(value1: number, value2?:number){
     if(value2){
       this._maxHandle.setValue(value1);
@@ -134,7 +126,13 @@ export class SliderModel {
       this._maxHandle.setValue(value1);
     }
   }
-
-
- 
+  
+  getSliderHandles() {
+    return [this._minHandle, this._maxHandle];
+  }
+  public get slideEvent() {
+    return this._slideEvent.asEvent();
+  }
+  
+  
 };
