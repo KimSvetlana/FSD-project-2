@@ -263,7 +263,7 @@ class ColorRangeView extends OrientedView {
         super(colorRangeObject, options.vertical);
         this._colorRangeObject = colorRangeObject;
 
-        colorRangeObject.css('background-color', options.backgroundColor);
+        this._colorRangeObject.css('background-color', options.backgroundColor);
         this._oriented.height = options.thickness;
     }
 
@@ -396,6 +396,13 @@ export class View {
         return this._indicator;
     }
 
+    public get scale() : ScaleView {
+        return this._scale;
+    }
+    public get colorRange() : ColorRangeView {
+        return this._colorRange;
+    }
+
     private initialize(options: object, $this) {
 
         let content = "<div class='slider-range-content'>" +
@@ -449,11 +456,10 @@ export class View {
 
         // шкала значений
         let wrapScale = "<div class='slider-scale-values'></div>"
-        if (options.scaleOfValues){
-            slider.append(wrapScale);
-            let sliderScale = $this.find('.slider-scale-values');
-            this._scale = new ScaleView(sliderScale, options);
-        }
+        slider.append(wrapScale);
+        let sliderScale = $this.find('.slider-scale-values');
+        this._scale = new ScaleView(sliderScale, options);
+        this._scale.setVisible(options.scaleOfValues);
     }
 
     private _onSlideEvent(handle: HandleView, value: IHasValue){

@@ -40,24 +40,25 @@
 
 <body>
     <div class = 'container'>
-        <div class='slider-range-container'></div>
+        <div class='slider-range-container' id = '1'></div>
 
         <input class = 'stepCounter' type="number" value="1" min = '1', max = '10'  ></input>
         <button class='indicatorVisibility' value = 'true'>ON</button>
 
-        <div class = 'slider-value-container'>Значение:<span class = 'slider-value'></span>
+        <div class = 'slider-value-container'>Значение:<span class = 'slider-value' id = '1'></span>
         </div>
-        <div class='slider-range-container'></div>
-        <div class = 'slider-value-container'>Значение:<span class = 'slider-value'></span></div>
-        <div class='slider-range'></div>
-        <div class = 'slider-value-container'>Значение:<span class = 'slider-value'></span></div>
-        <div class='vertical-slider'></div>
+        <div class='slider-range-container' id = '2'></div>
+        <div class = 'slider-value-container'>Значение:<span class = 'slider-value' id = '2'></span></div>
+        <div class='slider-range' id = '3'></div>
+        <div class = 'slider-value-container'>Значение:<span class = 'slider-value' id = '3'></span></div>
+        <div class='vertical-slider' id = '4'></div>
     </div>
     
     <script src='bundle.js'></script>
     <script>
         $('.slider-range-container').each(function () {
             let $this = $(this);
+            let id = $this.attr('id');
             $this.mySliderPlugin({
                 scaleOfValues: true,
                 indicatorVisibility: true,
@@ -65,7 +66,9 @@
                 max: 50,
                 step: 2,
                 slideHandler: function (slideEvent) {
-                    $this.next().find('.slider-value').text(slideEvent.value)
+                    let selector = `.slider-value[id$=${id}]`;
+                    let sliderValue =  $this.parent().find(selector);
+                    $this.parent().find(selector).text(slideEvent.value);
                 }
             });
         });
@@ -106,7 +109,7 @@
                 sliderRange.next().find('.slider-value').text('от ' + sliderState.values[0] + ' до ' + sliderState.values[1])
             }
         });
-        sliderRange.mySliderPlugin('values', [-30, 70]);
+        sliderRange.mySliderPlugin('values', [-50, 50]);
 
         
         $('.vertical-slider').mySliderPlugin({ 

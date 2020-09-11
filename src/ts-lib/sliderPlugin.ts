@@ -36,6 +36,8 @@ export class SliderPlugin {
 
             // case 'indicatorVisibility':
             //     return this._view.indicatorVisibility
+            // case 'min'
+            // case 'max'
         }
     }
 
@@ -52,6 +54,12 @@ export class SliderPlugin {
             
             case 'indicatorVisibility':
                 return this._view.indicator.setVisible(value);
+            
+            case 'scaleVisibility':
+                return this._view.scale.setVisible(value);
+            
+            case 'backgroundColor':
+                return this._view.colorRange.element.css('background-color', value);
         }
     }
 

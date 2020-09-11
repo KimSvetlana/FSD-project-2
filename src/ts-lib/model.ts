@@ -112,6 +112,7 @@ export class SliderModel {
     this._minValue = value;
     this._minHandle.setBounds(new StaticValue(this._minValue), this._maxHandle);
   }
+  // getMinBound(){}
 
   setMaxBound(value: number) {
     this._minValue = value;
@@ -144,7 +145,5 @@ export class SliderModel {
     this._slideEvent.dispatch(new SlideEvent(
       [this._minHandle.getValue(), this._maxHandle.getValue()], 
       handle.getValue()));
-  }
-  
-  
+  }  
 };
