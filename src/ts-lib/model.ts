@@ -4,16 +4,20 @@ export interface IHasValue {
   getValue() : number;
 };
 
-class StaticValue implements IHasValue {
+class HasValue implements IHasValue{
   value: number;
-  constructor(value:number){
+  constructor(value : number){
     this.value = value;
   }
 
-  getValue() {
+  setValue(value: number){
+    this.value = value;
+  }
+
+  getValue(){
     return this.value;
   }
-};
+}
 
 export class SlideEvent {
   values: number[];
@@ -77,20 +81,28 @@ export class SliderModel {
   private _minHandle: HandleModel;
   private _maxHandle: HandleModel;
   private _activeHandle: HandleModel;
-  private _minValue: number;
-  private _maxValue: number;
+  private _minValue: HasValue;
+  private _maxValue: HasValue;
   private _isDouble: boolean;
   private _slideEvent = new SimpleEventDispatcher<SlideEvent>();
   
-  constructor(options) {
-    this._minValue = options.min;
-    this._maxValue = options.max;
-    
+  constructor(options) {    
     this._minHandle = new HandleModel(options.min);
     this._maxHandle = new HandleModel(options.max);
-    this.setMinBound(options.min);
-    this.setMaxBound(options.max);
+    this._minValue = new HasValue(options.min);
+    this._maxValue = new HasValue(options.max);
     this.step = options.step;
+    this._isDouble = options.isDouble;
+
+    if (this._isDouble){
+      this._minHandle.setBounds(this._minValue, this._maxHandle);
+      this._maxHandle.setBounds(this._minHandle,this._maxValue);
+    }
+    else{
+      this._minHandle.setBounds(this._minValue, this._minValue);
+      this._maxHandle.setBounds(this._minValue, this._maxValue);
+    }
+
     let self = this;
     for (var handle of [this._minHandle, this._maxHandle]){
       handle.slideEvent.subscribe((handle: IHasValue) => {
@@ -108,15 +120,29 @@ export class SliderModel {
     return this._maxHandle.step;
   }
 
-  setMinBound(value: number) {
-    this._minValue = value;
-    this._minHandle.setBounds(new StaticValue(this._minValue), this._maxHandle);
+  setMinValue(value: number) {
+    this._minValue.setValue(value);
   }
-  // getMinBound(){}
+  getMinValue(){
+    return this._minValue.getValue();
+  }
+  
+  setMaxValue(value: number) {
+    this._maxValue.setValue(value);
+  }
 
-  setMaxBound(value: number) {
-    this._minValue = value;
-    this._maxHandle.setBounds(this._minHandle, new StaticValue(this._maxValue));
+  getMaxValue(){
+    return this._maxValue.getValue();
+  }
+
+  mapToOffset(value: number, minOffset : number, maxOffset : number) : number {
+    let proportion = (value - this.getMinValue()) / (this.getMaxValue() - this.getMinValue());
+    return minOffset + proportion * (maxOffset - minOffset);
+  }
+
+  mapToValue(offset: number, minOffset: number, maxOffset: number) {
+    let proportion = (offset - minOffset) / (maxOffset - minOffset);
+    return this.getMinValue() + proportion * (this.getMaxValue() - this.getMinValue());  
   }
 
   getSliderValue(){

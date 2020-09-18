@@ -8,8 +8,8 @@ export class Controller {
   private _handleMinObject: JQuery;
   private _handleMaxObject: JQuery;
 
-  private _minBounds: number;
-  private _maxBounds: number;
+  private _minOffset: number;
+  private _maxOffset: number;
   private _slider: JQuery;
 
   constructor(
@@ -25,8 +25,8 @@ export class Controller {
     this._handleMinObject = handleMinObject;
     this._handleMaxObject = handleMaxObject;
 
-    this._minBounds = minBounds;
-    this._maxBounds = maxBounds;
+    this._minOffset = minBounds;
+    this._maxOffset = maxBounds;
     this._slider = slider;
 
     let self = this;
@@ -74,8 +74,15 @@ export class Controller {
         movePos = movePosition.pageX;
     }
 
-    let proportion = (movePos - this._minBounds) / (this._maxBounds - this._minBounds);
-    let value = this._options.min + proportion * (this._options.max - this._options.min);
+    let value = this._model.mapToValue(movePos, this._minOffset, this._maxOffset);
     this._activeHandle.setValue(value);
+  }
+
+  disable(){
+    this._handleMinObject.off("mousedown");
+    
+    this._handleMaxObject.off("mousedown");
+    
+    this._slider.off('click');
   }
 }  

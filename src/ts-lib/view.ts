@@ -1,4 +1,5 @@
-import {IHasValue, SliderModel} from './model';
+import {IHasValue, SliderModel, SlideEvent, HandleModel} from './model';
+
 
 interface IOrientedElement {
     element : JQuery;
@@ -183,14 +184,14 @@ class HandleView extends OrientedView {
     private _handleObject: JQuery;
     private _minOffset: number;
     private _maxOffset: number;
-    private _maxValue: number;
-    private _minValue: number;
     private _handleWidth: number;
+    private _model: SliderModel;
 
-    constructor(handleObject: JQuery, vertical: boolean, thickness : number){
+    constructor(handleObject: JQuery, vertical: boolean, thickness : number, model: SliderModel){
         super(handleObject, vertical);
         this._handleObject = handleObject;
-        this._handleWidth = thickness * 2;       
+        this._handleWidth = thickness * 2;
+        this._model = model;       
 
         // параметры и расположение бегунка
         this._handleObject.css({ 'width': this._handleWidth, 'height': this._handleWidth });
@@ -214,14 +215,8 @@ class HandleView extends OrientedView {
         return this._maxOffset;
     }
 
-    setRange(minValue, maxValue){
-        this._minValue = minValue;
-        this._maxValue = maxValue;
-    }
-
     setOffsetFromValue(sliderValue: number) {
-        let proportion = (sliderValue - this._minValue) / (this._maxValue - this._minValue);
-        let offset = this._minOffset + proportion * (this._maxOffset - this._minOffset);
+        let offset = this._model.mapToOffset(sliderValue, this._minOffset, this._maxOffset);
 
         // корректировка относительно центра бегунка
         this._oriented.offsetCenter = offset;
@@ -310,7 +305,35 @@ class ScaleView extends OrientedView {
                 arrSpan.eq(i).css('left', count);
             }
         }
+        
+        // let arrNumberScale = this._scaleObject.find('.scale-number');
 
+        // if(!options.vertical){
+        //     arrNumberScale.css({'top': '10px', 'left' : '-5px'});
+        // }
+        // else{
+        //     arrNumberScale.css({'left': '10px', 'top':'-5px'});
+        // };
+
+        // let stepScale = (options.max - options.min) / (options.scaleDivision);
+        // let scaleValue = 0;
+
+        // for(let i = 0, j = arrNumberScale.length -1; i < arrNumberScale.length, j >= 0; i++, j--){
+        //     scaleValue = options.min + stepScale * i;
+        //     if(options.vertical){
+        //         arrNumberScale.eq(j).text(scaleValue);
+        //     }
+        //     else{
+        //         arrNumberScale.eq(i).text(scaleValue);
+        //     }
+        // }
+    }
+
+    // setStep(stepValue: number) {
+
+    // }
+
+    setRange(minValue: number, maxValue: number, options:object) {
         let arrNumberScale = this._scaleObject.find('.scale-number');
 
         if(!options.vertical){
@@ -319,8 +342,7 @@ class ScaleView extends OrientedView {
         else{
             arrNumberScale.css({'left': '10px', 'top':'-5px'});
         };
-
-        let stepScale = (options.max - options.min) / (options.scaleDivision);
+        let stepScale = (maxValue - minValue) / (options.scaleDivision);
         let scaleValue = 0;
 
         for(let i = 0, j = arrNumberScale.length -1; i < arrNumberScale.length, j >= 0; i++, j--){
@@ -334,13 +356,6 @@ class ScaleView extends OrientedView {
         }
     }
 
-    setStep(stepValue: number) {
-
-    }
-
-    setRange(minValue: number, maxValue: number) {
-
-    }
 }
 
 class SliderBarView extends OrientedView {
@@ -366,8 +381,13 @@ export class View {
     private _indicator: IndicatorView;
     private _scale: ScaleView;
     private _colorRange: ColorRangeView;
+    private _model: SliderModel;
+
+    private _minValue :number;
+    private _maxValue : number;
 
     constructor(model: SliderModel, options:object, $this){
+        this._model = model;
         this.initialize(options, $this);
 
         let handleModels = model.getSliderHandles();
@@ -378,6 +398,9 @@ export class View {
         handleModels[1].slideEvent.subscribe((value: IHasValue) => {
             this._onSlideEvent(this._maxHandle, value);
         });
+
+        this._minValue = model.getMinValue();
+        this._maxValue = model.getMaxValue();
     }
 
     public get sliderBar() : SliderBarView {
@@ -423,14 +446,11 @@ export class View {
 
         let handles = $this.find('.slider-range-handle');
 
-        this._minHandle = new HandleView(handles.first(), options.vertical, options.thickness);
+        this._minHandle = new HandleView(handles.first(), options.vertical, options.thickness, this._model);
         this._minHandle.setBounds(minOffset, maxOffset);
 
-        this._maxHandle = new HandleView(handles.last(), options.vertical, options.thickness);
+        this._maxHandle = new HandleView(handles.last(), options.vertical, options.thickness, this._model);
         this._maxHandle.setBounds(minOffset, maxOffset);
-
-        this._minHandle.setRange(options.min, options.max);
-        this._maxHandle.setRange(options.min, options.max);
 
         // Начальное положение бегунков
         this._minHandle.setOffsetFromValue(options.min);
@@ -459,6 +479,8 @@ export class View {
         slider.append(wrapScale);
         let sliderScale = $this.find('.slider-scale-values');
         this._scale = new ScaleView(sliderScale, options);
+        this._scale.setRange(this._minValue, this._maxValue, options);
+        
         this._scale.setVisible(options.scaleOfValues);
     }
 
@@ -469,6 +491,9 @@ export class View {
     }
 
     destroy(){
-        this._sliderBar.hide();
+        this._sliderBar.setVisible(false);
+        this._indicator.setVisible(false);
+        this._scale.setVisible(false);
     }
+
 }

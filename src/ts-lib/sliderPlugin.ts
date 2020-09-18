@@ -33,11 +33,10 @@ export class SliderPlugin {
         switch (name) {
             case "step":
                 return this._model.step;
-
-            // case 'indicatorVisibility':
-            //     return this._view.indicatorVisibility
-            // case 'min'
-            // case 'max'
+            case 'min':
+                return this._model.getMinValue();
+            case 'max':
+                return this._model.getMaxValue();
         }
     }
 
@@ -47,10 +46,10 @@ export class SliderPlugin {
                 return this._model.step = value;
             
             case 'min': 
-                return this._model.setMinBound(value);
+                return this._model.setMinValue(value);
             
             case 'max': 
-                return this._model.setMaxBound(value);
+                return this._model.setMaxValue(value);
             
             case 'indicatorVisibility':
                 return this._view.indicator.setVisible(value);
@@ -75,4 +74,8 @@ export class SliderPlugin {
         return this._view.destroy();
     }
 
+    disable(){
+        this._view.colorRange.element.css('background-color', 'rgb(193, 208, 232)');
+        return this._controller.disable();
+    }
 }

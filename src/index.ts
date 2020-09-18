@@ -39,15 +39,21 @@ import {SliderPlugin} from './ts-lib/sliderPlugin'
             return plugin.destroy();
         },
 
+        disable : function() {
+            let $this = $(this);
+            let plugin = $this.data(pluginName) as SliderPlugin;
+            return plugin.disable();
+        },
+
         option : function(name:string, value:any) {
-            if (arguments.length) {
+            if (value != undefined) {
                 return this.each(function() {
                     let $this = $(this);
                     let plugin = $this.data(pluginName) as SliderPlugin; 
                     plugin.setOption(name, value);
                 });
             }
-            else {    
+            else {   
                 let $this = this.first();
                 let plugin = $this.data(pluginName) as SliderPlugin;       
                 return plugin.getOption(name);
@@ -55,7 +61,7 @@ import {SliderPlugin} from './ts-lib/sliderPlugin'
         },
 
         value : function(val: number){  
-            if (arguments.length) {
+            if (val != undefined) {
                 return this.each(function() {
                     let $this = $(this);
                     let plugin = $this.data(pluginName) as SliderPlugin; 
@@ -71,7 +77,7 @@ import {SliderPlugin} from './ts-lib/sliderPlugin'
         },
 
         values: function (val: any) {
-            if (arguments.length) {
+            if (val != undefined) {
                 return this.each(function () {
                     let maxValue = Math.max.apply(null, val);
                     let minValue = Math.min.apply(null, val);
