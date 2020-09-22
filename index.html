@@ -91,15 +91,24 @@
                       
         });
         
-        let value = $('.slider-range-container').mySliderPlugin('value');
-        $('.slider-value').text(value);
-        
-        let newValue = 0;
-        $('.slider-range-container').mySliderPlugin('value', newValue);
-        
-        // let min = -150;
-        // $('.slider-range-container').mySliderPlugin('option', 'min', min );
+        // let newValue = 0;
+        // $('.slider-range-container').mySliderPlugin('value', newValue);
+
+        // $('.slider-range-container').mySliderPlugin('option', 'backgroundColor', 'red');
+        // $('.slider-range-container').mySliderPlugin('option', 'scaleVisibility', false);
         // $('.slider-range-container').mySliderPlugin('destroy');
+        // $('.slider-range-container').mySliderPlugin('disable');
+        
+        // let minValue = $('.slider-range-container').mySliderPlugin('option', 'min');
+        // console.log("min value = " + minValue);
+
+        let min = -150;
+        $('.slider-range-container').mySliderPlugin('option', 'min', min );
+
+        let max = 150;
+        $('.slider-range-container').mySliderPlugin('option', 'max', max );
+
+
         
         let sliderRange = $('.slider-range');
         sliderRange.mySliderPlugin({
@@ -112,16 +121,16 @@
         sliderRange.mySliderPlugin('values', [-50, 50]);
 
         
-        $('.vertical-slider').mySliderPlugin({ 
-            isDouble: true, 
-            vertical: true,
-            min: -10000,
-            max: 20000,
-            step: 99,
-            thickness: 15, 
-            indicatorVisibility: true,
-            scaleOfValues: true,
-        });
+        // $('.vertical-slider').mySliderPlugin({ 
+        //     isDouble: true, 
+        //     vertical: true,
+        //     min: -10000,
+        //     max: 20000,
+        //     step: 99,
+        //     thickness: 15, 
+        //     indicatorVisibility: true,
+        //     scaleOfValues: true,
+        // });
 
     </script>
 

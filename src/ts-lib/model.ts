@@ -78,6 +78,7 @@ export class HandleModel implements IHasValue {
 };
 
 export class SliderModel {
+  private _options: object;
   private _minHandle: HandleModel;
   private _maxHandle: HandleModel;
   private _activeHandle: HandleModel;
@@ -86,7 +87,8 @@ export class SliderModel {
   private _isDouble: boolean;
   private _slideEvent = new SimpleEventDispatcher<SlideEvent>();
   
-  constructor(options) {    
+  constructor(options: object) {  
+    this._options = options;  
     this._minHandle = new HandleModel(options.min);
     this._maxHandle = new HandleModel(options.max);
     this._minValue = new HasValue(options.min);
@@ -137,12 +139,14 @@ export class SliderModel {
 
   mapToOffset(value: number, minOffset : number, maxOffset : number) : number {
     let proportion = (value - this.getMinValue()) / (this.getMaxValue() - this.getMinValue());
+    console.log('minValue = ', this.getMinValue())
     return minOffset + proportion * (maxOffset - minOffset);
+
   }
 
   mapToValue(offset: number, minOffset: number, maxOffset: number) {
     let proportion = (offset - minOffset) / (maxOffset - minOffset);
-    return this.getMinValue() + proportion * (this.getMaxValue() - this.getMinValue());  
+    return this.getMinValue() + proportion * (this.getMaxValue() - this.getMinValue());
   }
 
   getSliderValue(){
@@ -171,5 +175,5 @@ export class SliderModel {
     this._slideEvent.dispatch(new SlideEvent(
       [this._minHandle.getValue(), this._maxHandle.getValue()], 
       handle.getValue()));
-  }  
-};
+  } 
+}

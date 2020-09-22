@@ -46,10 +46,12 @@ export class SliderPlugin {
                 return this._model.step = value;
             
             case 'min': 
-                return this._model.setMinValue(value);
+                this._model.setMinValue(value);
+                this._view.scale.setRange(value, this._model.getMaxValue());
             
             case 'max': 
-                return this._model.setMaxValue(value);
+                this._model.setMaxValue(value);
+                this._view.scale.setRange(this._model.getMinValue(), value);
             
             case 'indicatorVisibility':
                 return this._view.indicator.setVisible(value);

@@ -271,22 +271,27 @@ class ColorRangeView extends OrientedView {
 
 class ScaleView extends OrientedView {
     private _scaleObject: JQuery;
+    private _isVertical: boolean;
+    private _scaleDivision: number;
 
     constructor(sliderObject : JQuery, options: object){
         super(sliderObject, options.vertical);
         this._scaleObject = sliderObject;
+        this._isVertical = options.vertical;
+        this._scaleDivision =  options.scaleDivision;
 
         this._oriented.top = options.thickness * 1.5;
         this._oriented.width = 'inherit';
         this._oriented.height = 0;
 
-        for(let i = 0; i < options.scaleDivision + 1; i++){
+
+        for(let i = 0; i < this._scaleDivision + 1; i++){
             this._scaleObject.append("<span><i class='scale-number'></i></span>");
         }
 
         let arrSpan = this._scaleObject.children('span');
 
-        if(!options.vertical){
+        if(!this._isVertical){
             arrSpan.css({'border-left': '1px solid grey', 'height' : '8px'});
         }
         else{
@@ -298,7 +303,7 @@ class ScaleView extends OrientedView {
 
         for(let i = 0; i < arrSpan.length; i++){
             count = `${indicatorLeft * i}%`;
-            if(options.vertical){
+            if(this._isVertical){
                 arrSpan.eq(i).css('top', count);
             }
             else{
@@ -306,48 +311,27 @@ class ScaleView extends OrientedView {
             }
         }
         
-        // let arrNumberScale = this._scaleObject.find('.scale-number');
-
-        // if(!options.vertical){
-        //     arrNumberScale.css({'top': '10px', 'left' : '-5px'});
-        // }
-        // else{
-        //     arrNumberScale.css({'left': '10px', 'top':'-5px'});
-        // };
-
-        // let stepScale = (options.max - options.min) / (options.scaleDivision);
-        // let scaleValue = 0;
-
-        // for(let i = 0, j = arrNumberScale.length -1; i < arrNumberScale.length, j >= 0; i++, j--){
-        //     scaleValue = options.min + stepScale * i;
-        //     if(options.vertical){
-        //         arrNumberScale.eq(j).text(scaleValue);
-        //     }
-        //     else{
-        //         arrNumberScale.eq(i).text(scaleValue);
-        //     }
-        // }
     }
 
     // setStep(stepValue: number) {
 
     // }
 
-    setRange(minValue: number, maxValue: number, options:object) {
+    setRange(minValue: number, maxValue: number) {
         let arrNumberScale = this._scaleObject.find('.scale-number');
 
-        if(!options.vertical){
+        if(!this._isVertical){
             arrNumberScale.css({'top': '10px', 'left' : '-5px'});
         }
         else{
             arrNumberScale.css({'left': '10px', 'top':'-5px'});
         };
-        let stepScale = (maxValue - minValue) / (options.scaleDivision);
+        let stepScale = (maxValue - minValue) / (this._scaleDivision);
         let scaleValue = 0;
 
         for(let i = 0, j = arrNumberScale.length -1; i < arrNumberScale.length, j >= 0; i++, j--){
-            scaleValue = options.min + stepScale * i;
-            if(options.vertical){
+            scaleValue = minValue + stepScale * i;
+            if(this._isVertical){
                 arrNumberScale.eq(j).text(scaleValue);
             }
             else{
@@ -388,7 +372,7 @@ export class View {
 
     constructor(model: SliderModel, options:object, $this){
         this._model = model;
-        this.initialize(options, $this);
+        this.initialize(this._model, options, $this);
 
         let handleModels = model.getSliderHandles();
         handleModels[0].slideEvent.subscribe((value: IHasValue) => {
@@ -401,8 +385,10 @@ export class View {
 
         this._minValue = model.getMinValue();
         this._maxValue = model.getMaxValue();
-    }
 
+        // console.log('modelMaxValue = ' ,this._maxValue, "modelMinValue = ", this._minValue);
+    }
+    
     public get sliderBar() : SliderBarView {
         return this._sliderBar;
     }
@@ -426,8 +412,7 @@ export class View {
         return this._colorRange;
     }
 
-    private initialize(options: object, $this) {
-
+    private initialize(model:SliderModel ,options: object, $this) {
         let content = "<div class='slider-range-content'>" +
                         "<div class='slider-color-range'></div>" +
                         "<span class='slider-range-handle'></span>" +
@@ -479,7 +464,12 @@ export class View {
         slider.append(wrapScale);
         let sliderScale = $this.find('.slider-scale-values');
         this._scale = new ScaleView(sliderScale, options);
-        this._scale.setRange(this._minValue, this._maxValue, options);
+
+        let minValue = model.getMinValue();
+        let maxValue = model.getMaxValue();
+        // console.log("minValue =" ,minValue, "maxValue= ", maxValue);
+
+        this._scale.setRange(minValue, maxValue, options);
         
         this._scale.setVisible(options.scaleOfValues);
     }
