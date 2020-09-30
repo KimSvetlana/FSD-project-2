@@ -1,4 +1,3 @@
-// import './ts-lib/sliderPlugin';
 import $ from 'jquery';
 global.jQuery = global.$ = $;
 import './scss/style.scss';
@@ -17,7 +16,7 @@ import {SliderPlugin} from './ts-lib/sliderPlugin'
                 min: -100,
                 max: 100,
                 step: 5,
-                scaleOfValues: false,
+                scaleVisibility: false,
                 scaleDivision: 5,
                 isDouble: false,
                 vertical: false,
@@ -43,6 +42,12 @@ import {SliderPlugin} from './ts-lib/sliderPlugin'
             let $this = $(this);
             let plugin = $this.data(pluginName) as SliderPlugin;
             return plugin.disable();
+        },
+
+        enable : function() {
+            let $this = $(this);
+            let plugin = $this.data(pluginName) as SliderPlugin;
+            return plugin.enable();
         },
 
         option : function(name:string, value:any) {

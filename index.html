@@ -8,11 +8,19 @@
         .container{
             width: 100%;
         }
+        .slider-wrapper{
+            border: 1px solid grey;
+            margin-top: 10px;
+        }
         .slider-range-container{
             width: 450px;
             height: 35px;
             margin-top: 50px;
             margin-left: 30px;
+        }
+        .wrap-control{
+            margin: 10px;
+
         }
         .slider-value-container{
             margin-top: 20px;
@@ -40,31 +48,82 @@
 
 <body>
     <div class = 'container'>
-        <div class='slider-range-container' id = '1'></div>
+        <div class = 'slider-wrapper'>
+            <div class='slider-range-container' id = '1'></div>
+            <div class = 'slider-value-container'><b>Значение:</b><span class = 'slider-value' id = '1'></span></div>
 
-        <input class = 'stepCounter' type="number" value="1" min = '1', max = '10'  ></input>
-        <button class='indicatorVisibility' value = 'true'>ON</button>
-
-        <div class = 'slider-value-container'>Значение:<span class = 'slider-value' id = '1'></span>
+            <div class = 'wrap-control'>Шаг<input class = 'stepCounter' id = '1' type="number" value="1" min = '1', max = '10'></input></div>
+            <div class = 'wrap-control'> Индикатор <button class='indicatorVisibility' id = '1' value = 'true'>ON</button></div>
+            <div class = 'wrap-control'>Шкала <button class='scaleVisibility' id = '1' value = 'true'>ON</button></div>
+            <div class = 'wrap-control'> Новые минимальное и максимальное значения
+                <input class = 'newMinValue' id = '1'></input><button class = 'newMinValue' id = '1'>GO</button>
+                <input class = 'newMaxValue' id = '1'></input><button class = 'newMaxValue' id = '1'>GO</button>
+            </div>
+            <div class = 'wrap-control'>Желаемый цвет <input class = 'color' id = '1'><button class = 'color-value' id = '1'>GO</button></div>
+            <div class = 'wrap-control'>Зададим значение слайдеру <input class = 'newValue' id = '1'></input><button class = 'newValue' id = '1'>GO</button></div>
+            <div class = 'wrap-control'>Доступность <button class = 'disableButton'  id = '1' value = 'false'>ON</button></div>
         </div>
-        <div class='slider-range-container' id = '2'></div>
-        <div class = 'slider-value-container'>Значение:<span class = 'slider-value' id = '2'></span></div>
-        <div class='slider-range' id = '3'></div>
-        <div class = 'slider-value-container'>Значение:<span class = 'slider-value' id = '3'></span></div>
-        <div class='vertical-slider' id = '4'></div>
+
+        <div class = 'slider-wrapper'>
+            <div class='slider-range-container' id = '2'></div>
+            <div class = 'slider-value-container'><b>Значение:</b><span class = 'slider-value' id = '2'></span></div>
+
+            <div class = 'wrap-control'>Шаг<input class = 'stepCounter'  id = '2' type="number" value="1" min = '1', max = '10'></input></div>
+            <div class = 'wrap-control'> Индикатор <button class='indicatorVisibility' id = '2' value = 'true'>ON</button></div>
+            <div class = 'wrap-control'>Шкала <button class='scaleVisibility' id = '2' value = 'true'>ON</button></div>
+            <div class = 'wrap-control'> Новые минимальное и максимальное значения
+                <input class = 'newMinValue' id = '2'></input><button class = 'newMinValue' id = '2'>GO</button>
+                <input class = 'newMaxValue' id = '2'></input><button class = 'newMaxValue' id = '2'>GO</button>
+            </div>
+            <div class = 'wrap-control'>Желаемый цвет <input class = 'color' id = '2' ><button class = 'color-value' id = '2'>GO</button></div>
+            <div class = 'wrap-control'>Зададим значение слайдеру <input class = 'newValue' id = '2'></input><button class = 'newValue' id = '2'>GO</button></div>
+            <div class = 'wrap-control'>Доступность <button class = 'disableButton' id = '2' value = 'false'>ON</button></div>
+        </div>
+
+        <div class = 'slider-wrapper'>
+            <div class='slider-range' id = '3'></div>
+            <div class = 'slider-value-container'><b>Значение:</b><span class = 'slider-value' id = '3'></span></div>
+
+            <div class = 'wrap-control'>Шаг<input class = 'stepCounter'  id = '3' type="number" value="1" min = '1', max = '10'></input></div>
+            <div class = 'wrap-control'> Индикатор <button class='indicatorVisibility' id = '3' value = 'true'>ON</button></div>
+            <div class = 'wrap-control'>Шкала <button class='scaleVisibility' id = '3' value = 'true'>OFF</button></div>
+            <div class = 'wrap-control'> Новые минимальное и максимальное значения
+                <input class = 'newMinValue' id = '3'></input><button class = 'newMinValue' id = '3'>GO</button>
+                <input class = 'newMaxValue' id = '3'></input><button class = 'newMaxValue' id = '3'>GO</button>
+            </div>
+            <div class = 'wrap-control'>Желаемый цвет <input class = 'color' id = '3' ><button class = 'color-value' id = '3'>GO</button></div>
+            <div class = 'wrap-control'>Зададим значение слайдеру <input class = 'newValues' id = '3'></input><button class = 'newValue' id = '3'>GO</button></div>
+            <div class = 'wrap-control'>Доступность <button class = 'disableButton'  id = '3' value = 'false'>ON</button></div>
+        </div>
+
+        <div class = 'slider-wrapper'>
+            <div class='vertical-slider' id = '4'></div>
+            <div class = 'slider-value-container'><b>Значение:</b><span class = 'slider-value' id = '3'></span></div>
+
+            <div class = 'wrap-control'>Шаг<input class = 'stepCounter'  id = '4' type="number" value="1" min = '1', max = '10'></input></div>
+            <div class = 'wrap-control'> Индикатор <button class='indicatorVisibility' id = '4' value = 'true'>ON</button></div>
+            <div class = 'wrap-control'>Шкала <button class='scaleVisibility' id = '4' value = 'true'>ON</button></div>
+            <div class = 'wrap-control'> Новые минимальное и максимальное значения
+                <input class = 'newMinValue' id = '4'></input><button class = 'newMinValue' id = '4'>GO</button>
+                <input class = 'newMaxValue' id = '4'></input><button class = 'newMaxValue' id = '4'>GO</button>
+            </div>
+            <div class = 'wrap-control'>Желаемый цвет <input class = 'color' id = '4' ><button class = 'color-value' id = '4'>GO</button></div>
+            <div class = 'wrap-control'>Доступность <button class = 'disableButton'  id = '4' value = 'false'>ON</button></div>
+        </div>
     </div>
     
     <script src='bundle.js'></script>
+
     <script>
         $('.slider-range-container').each(function () {
             let $this = $(this);
             let id = $this.attr('id');
             $this.mySliderPlugin({
-                scaleOfValues: true,
+                scaleVisibility: true,
                 indicatorVisibility: true,
                 min: -50,
                 max: 50,
-                step: 2,
+                step: 1,
                 slideHandler: function (slideEvent) {
                     let selector = `.slider-value[id$=${id}]`;
                     let sliderValue =  $this.parent().find(selector);
@@ -72,42 +131,6 @@
                 }
             });
         });
-
-        $('.stepCounter').change(function(){
-            let stepCount = $('.stepCounter').val();
-            $('.slider-range-container').mySliderPlugin('option', 'step', stepCount);
-        });
-        
-        $('.indicatorVisibility').click(function(){
-           let text = $('.indicatorVisibility').text();           
-            if(text ==="ON"){
-                $('.slider-range-container').mySliderPlugin('option', 'indicatorVisibility', false);
-                return $(this).text("OFF");
-            }
-            else{
-                $('.slider-range-container').mySliderPlugin('option', 'indicatorVisibility', true);
-                return $(this).text( "ON");
-            }
-                      
-        });
-        
-        // let newValue = 0;
-        // $('.slider-range-container').mySliderPlugin('value', newValue);
-
-        // $('.slider-range-container').mySliderPlugin('option', 'backgroundColor', 'red');
-        // $('.slider-range-container').mySliderPlugin('option', 'scaleVisibility', false);
-        // $('.slider-range-container').mySliderPlugin('destroy');
-        // $('.slider-range-container').mySliderPlugin('disable');
-        
-        // let minValue = $('.slider-range-container').mySliderPlugin('option', 'min');
-        // console.log("min value = " + minValue);
-
-        let min = -150;
-        $('.slider-range-container').mySliderPlugin('option', 'min', min );
-
-        let max = 150;
-        $('.slider-range-container').mySliderPlugin('option', 'max', max );
-
 
         
         let sliderRange = $('.slider-range');
@@ -119,21 +142,132 @@
             }
         });
         sliderRange.mySliderPlugin('values', [-50, 50]);
-
         
-        // $('.vertical-slider').mySliderPlugin({ 
-        //     isDouble: true, 
-        //     vertical: true,
-        //     min: -10000,
-        //     max: 20000,
-        //     step: 99,
-        //     thickness: 15, 
-        //     indicatorVisibility: true,
-        //     scaleOfValues: true,
-        // });
+        let verticalSlider = $('.vertical-slider');
+        $(verticalSlider).mySliderPlugin({ 
+            isDouble: true, 
+            vertical: true,
+            min: -10000,
+            max: 20000,
+            step: 99,
+            thickness: 15, 
+            indicatorVisibility: true,
+            scaleVisibility: true,
+            slideHandler: function (sliderState) {
+                verticalSlider.next().find('.slider-value').text('от ' + sliderState.values[0] + ' до ' + sliderState.values[1])
+            }
+        });
+        
+        $('.stepCounter').change(function(){
+            let $this = $(this);
+            let id = $this.attr('id');
+            let stepCount = $this.val();
+            let selector = $this.parent().parent().children().first().attr('class');
+            let sliderSelector = `.${selector}[id$=${id}]`;
+            $(sliderSelector).mySliderPlugin('option', 'step', stepCount);
+        });
+        
+        $('.indicatorVisibility').click(function(){
+            let $this = $(this);
+            let id = $this.attr('id');
+            let text = $this.text();
+            let selector = $this.parent().parent().children().first().attr('class');
+            let sliderSelector = `.${selector}[id$=${id}]`;
+            if(text ==="ON"){
+                $(sliderSelector).mySliderPlugin('option', 'indicatorVisibility', false);
+                return $(this).text("OFF");
+            }
+            else{
+                $(sliderSelector).mySliderPlugin('option', 'indicatorVisibility', true);
+                return $(this).text( "ON");
+            }
+                      
+        });
+
+        $('.scaleVisibility').click(function(){
+            let $this = $(this);
+            let id = $this.attr('id');
+            let text = $this.text();
+            let selector = $this.parent().parent().children().first().attr('class');
+            let sliderSelector = `.${selector}[id$=${id}]`;
+            if(text ==="ON"){
+                $(sliderSelector).mySliderPlugin('option', 'scaleVisibility', false);
+                return $(this).text("OFF");
+            }
+            else{
+                $(sliderSelector).mySliderPlugin('option', 'scaleVisibility', true);
+                return $(this).text( "ON");
+            }
+                      
+        });
+
+        $('.color-value').click(function(){
+            let $this = $(this);
+            let id = $this.attr('id');
+            let newColorSelector = `input.color[id$=${id}]`;
+            let newColor = $(newColorSelector).val();
+            let selector = $this.parent().parent().children().first().attr('class');
+            let sliderSelector = `.${selector}[id$=${id}]`;
+            $(sliderSelector).mySliderPlugin('option', 'backgroundColor', newColor);
+        });
+
+        $('button.newMinValue').click(function(){
+            let $this = $(this);
+            let id = $this.attr('id');
+            let newMinValueIdSelector = `input.newMinValue[id$=${id}]`
+            let newMinValue = $(newMinValueIdSelector).val();
+            let selector = $this.parent().parent().children().first().attr('class');
+            let sliderSelector = `.${selector}[id$=${id}]`;
+            $(sliderSelector).mySliderPlugin('option', 'min', Number(newMinValue));
+        });
+
+        $('button.newMaxValue').click(function(){
+            let $this = $(this);
+            let id = $this.attr('id');
+            let newMaxValueIdSelector = `input.newMaxValue[id$=${id}]`
+            let newMaxValue = $(newMaxValueIdSelector).val();
+            let selector = $this.parent().parent().children().first().attr('class');
+            let sliderSelector = `.${selector}[id$=${id}]`;
+            $(sliderSelector).mySliderPlugin('option', 'max', Number(newMaxValue));
+        });
+
+        $('button.newValue').click(function(){
+            let $this = $(this);
+            let id = $this.attr('id');
+            let selector = $this.parent().parent().children().first().attr('class');
+            let sliderSelector = `.${selector}[id$=${id}]`;
+            if($this.prev().attr('class') === 'newValue'){
+                let newValueIdSelector = `input.newValue[id$=${id}]`
+                let newValue = $(newValueIdSelector).val();
+                $(sliderSelector).mySliderPlugin('value',Number(newValue));
+            }
+            else{
+                let newValueIdSelector = `input.newValues[id$=${id}]`
+                let newValues = $(newValueIdSelector).val();
+                let arr = newValues.split(',');
+                arr.forEach(element => Number(element));
+                console.log(arr)
+                $(sliderSelector).mySliderPlugin('values', arr);
+            }
+        });
+
+        $('.disableButton').click(function(){
+            let $this = $(this);
+            let id = $this.attr('id');
+            let text = $this.text();
+            let selector = $this.parent().parent().children().first().attr('class');
+            let sliderSelector = `.${selector}[id$=${id}]`;
+            if(text ==='ON'){
+                $(sliderSelector).mySliderPlugin('disable');
+                return $(this).text('OFF');
+            }
+            else
+            {
+                $(sliderSelector).mySliderPlugin('enable');
+                return $(this).text('ON');
+            }
+        });
 
     </script>
-
 </body>
-
 </html>

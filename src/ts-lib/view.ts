@@ -1,4 +1,4 @@
-import {IHasValue, SliderModel, SlideEvent, HandleModel} from './model';
+import {IHasValue, SliderModel, SlideEvent, HandleModel, RangeValue} from './model';
 
 
 interface IOrientedElement {
@@ -55,11 +55,11 @@ class HorizontalElement extends OrientedElementBase implements IOrientedElement 
     }
 
     public get left() : number {
-        return this._getProperty("left");
+        return this._getProperty('left');
     }
 
     public set left(value: number) : void {
-        this._setProperty("left", value);
+        this._setProperty('left', value);
     }
 
     public get offsetLeft() : number {
@@ -87,11 +87,11 @@ class HorizontalElement extends OrientedElementBase implements IOrientedElement 
     }
 
     public get top() : number {
-        return this._getProperty("top");
+        return this._getProperty('top');
     }
 
     public set top(value: number) : void {
-        this._setProperty("top", value);
+        this._setProperty('top', value);
     }
 }
 
@@ -118,11 +118,11 @@ class VerticalElement extends OrientedElementBase implements IOrientedElement {
     }
 
     public get left() : number {
-        return this._getProperty("top");
+        return this._getProperty('top');
     }
 
     public set left(value: number) : void {
-        this._setProperty("top", value);
+        this._setProperty('top', value);
     }
 
     public get offsetLeft() : number {
@@ -150,11 +150,11 @@ class VerticalElement extends OrientedElementBase implements IOrientedElement {
     }
 
     public get top() : number {
-        return this._getProperty("left");
+        return this._getProperty('left');
     }
 
     public set top(value: number) : void {
-        this._setProperty("left", value);
+        this._setProperty('left', value);
     }
 }
 
@@ -175,8 +175,8 @@ class OrientedView {
     }
 
     public setVisible(visible: boolean) : void {
-        let value = visible ? "visible" : "hidden";
-        this.element.css("visibility", value);
+        let value = visible ? 'visible' : 'hidden';
+        this.element.css('visibility', value);
     }
 }
 
@@ -313,10 +313,6 @@ class ScaleView extends OrientedView {
         
     }
 
-    // setStep(stepValue: number) {
-
-    // }
-
     setRange(minValue: number, maxValue: number) {
         let arrNumberScale = this._scaleObject.find('.scale-number');
 
@@ -386,7 +382,9 @@ export class View {
         this._minValue = model.getMinValue();
         this._maxValue = model.getMaxValue();
 
-        // console.log('modelMaxValue = ' ,this._maxValue, "modelMinValue = ", this._minValue);
+        model.rangeChangeEvent.subscribe((rangeValue: RangeValue) =>{
+            this.onRangeChange(rangeValue.minValue, rangeValue.maxValue);
+        })
     }
     
     public get sliderBar() : SliderBarView {
@@ -467,11 +465,10 @@ export class View {
 
         let minValue = model.getMinValue();
         let maxValue = model.getMaxValue();
-        // console.log("minValue =" ,minValue, "maxValue= ", maxValue);
 
-        this._scale.setRange(minValue, maxValue, options);
+        this._scale.setRange(minValue, maxValue);
         
-        this._scale.setVisible(options.scaleOfValues);
+        this._scale.setVisible(options.scaleVisibility);
     }
 
     private _onSlideEvent(handle: HandleView, value: IHasValue){
@@ -486,4 +483,7 @@ export class View {
         this._scale.setVisible(false);
     }
 
+    onRangeChange(min: number, max: number){
+        this._scale.setRange(min, max)
+    }    
 }

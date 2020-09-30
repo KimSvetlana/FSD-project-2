@@ -85,4 +85,18 @@ export class Controller {
     
     this._slider.off('click');
   }
+
+  enable(){
+    this._handleMinObject.on("mousedown", function (mouseEvent) {
+      self._onHandleMouseDown(sliderHandles[0]);
+    });
+
+    this._handleMaxObject.on("mousedown", function (mouseEvent) {
+      self._onHandleMouseDown(sliderHandles[1]);
+    });
+
+    this._slider.on('click', function(movePosition){      
+      self._onMouseMove(movePosition);
+    });
+  }
 }  

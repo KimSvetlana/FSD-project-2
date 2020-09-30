@@ -29,6 +29,16 @@ export class SlideEvent {
   }
 }
 
+export class RangeValue {
+  minValue: number;
+  maxValue: number;
+
+  constructor(min: number, max: number){
+    this.minValue = min;
+    this.maxValue = max;
+  }
+}
+
 export class HandleModel implements IHasValue {
   private _value: number;
   private _step: number;
@@ -86,6 +96,7 @@ export class SliderModel {
   private _maxValue: HasValue;
   private _isDouble: boolean;
   private _slideEvent = new SimpleEventDispatcher<SlideEvent>();
+  private _rangeChange = new SimpleEventDispatcher<RangeValue>();
   
   constructor(options: object) {  
     this._options = options;  
@@ -124,6 +135,7 @@ export class SliderModel {
 
   setMinValue(value: number) {
     this._minValue.setValue(value);
+    this._rangeChange.dispatch(new RangeValue(value, this.getMaxValue()));
   }
   getMinValue(){
     return this._minValue.getValue();
@@ -131,6 +143,7 @@ export class SliderModel {
   
   setMaxValue(value: number) {
     this._maxValue.setValue(value);
+    this._rangeChange.dispatch(new RangeValue(this.getMinValue(), value));
   }
 
   getMaxValue(){
@@ -139,9 +152,7 @@ export class SliderModel {
 
   mapToOffset(value: number, minOffset : number, maxOffset : number) : number {
     let proportion = (value - this.getMinValue()) / (this.getMaxValue() - this.getMinValue());
-    console.log('minValue = ', this.getMinValue())
     return minOffset + proportion * (maxOffset - minOffset);
-
   }
 
   mapToValue(offset: number, minOffset: number, maxOffset: number) {
@@ -175,5 +186,9 @@ export class SliderModel {
     this._slideEvent.dispatch(new SlideEvent(
       [this._minHandle.getValue(), this._maxHandle.getValue()], 
       handle.getValue()));
-  } 
+  }
+
+  public get rangeChangeEvent(){
+    return this._rangeChange.asEvent();
+  }  
 }
